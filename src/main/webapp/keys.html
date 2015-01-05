@@ -1,0 +1,84 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Key Pairs</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="alert alert-danger" role="alert" ng-show="error">
+            <div class="row">
+                <div class="col-xs-2 text-center">
+                    <i class="fa fa-warning fa-2x"></i>
+                </div>
+                <p class="col-xs-10">
+                    {{error}}
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div>
+                <button type="button" class="pull-right btn btn-info" ng-click="generateKeys('sig')">New Signature Key Pair</button>
+                    </div>
+                <div>
+                <button type="button" class="pull-right btn btn-info" ng-click="generateKeys('encrypt')">New Encrypt Key Pair</button>
+                    </div>
+            </div>
+        </div>
+        <div class="spacer20"></div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-refresh fa-spin" ng-hide="signatureKeys"></i>&nbsp;
+                    Signature Key Pair
+                    <i class="pull-right fa fa-trash-o" ng-click="delete('sig')"></i>
+                </h3>
+            </div>
+            <div class="panel-body" ng-show="signatureKeys">
+                <h4>Public Key</h4>
+                <samp><pre>{{signatureKeys[0]}}</pre></samp>
+                <div class="spacer15"></div>
+
+                <button type="button" class="pull-right btn btn-info" ng-model="showSigPrivateKey" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">Show Private Key</button>
+                <div ng-show="showSigPrivateKey">
+                    <h4>Private Key</h4>
+                    <samp><pre>{{signatureKeys[1]}}</pre></samp>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <i class="fa fa-refresh fa-spin" ng-hide="encryptKeys"></i>&nbsp;
+                    Encrypt Key Pair
+                    <i class="pull-right fa fa-trash-o" ng-click="delete('encrypt')"></i>
+                </h3>
+            </div>
+            <div class="panel-body" ng-show="encryptKeys">
+                <h4>Public Key</h4>
+                <samp><pre>{{encryptKeys[0]}}</pre></samp>
+                <div class="spacer15"></div>
+
+                <button type="button" class="pull-right btn btn-info" ng-model="showEncryptPrivateKey" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">Show Private Key</button>
+                <div ng-show="showEncryptPrivateKey">
+                    <h4>Private Key</h4>
+                    <samp><pre>{{encryptKeys[1]}}</pre></samp>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+

@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="CloudDashboardApp">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Cloud Manager</title>
+
+    <link rel="shortcut icon" href="assets/images/favicon.ico" />
+
+    <link href="assets/libs/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="assets/libs/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/cloud.css" rel="stylesheet">
+
+    <script src="assets/libs/jquery/1.11.1/jquery-1.11.1.min.js"></script>
+    <script src="assets/libs/lodash.js/2.4.1/lodash.min.js"></script>
+    <script src="assets/libs/underscore.string/2.3.3/underscore.string.min.js"></script>
+    <script src="assets/libs/danialfarid-angular-file-upload/1.6.1/angular-file-upload-shim.min.js"></script>
+    <script src="assets/libs/angularjs/1.3.0/angular.min.js"></script>
+    <script src="assets/libs/angularjs/1.3.0/angular-resource.min.js"></script>
+    <script src="assets/libs/angularjs/1.3.0/angular-route.min.js"></script>
+    <script src="assets/libs/danialfarid-angular-file-upload/1.6.1/angular-file-upload.min.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="assets/libs/bootstrap/3.2.0/js/bootstrap.min.js"></script>
+    <script src="assets/libs/angular-bootstrap/0.11.2/ui-bootstrap-tpls-0.11.2.min.js"></script>
+
+    <script src="assets/js/cloud.js"></script>
+    <script src="app/app.js"></script>
+    <script src="app/controllers.js"></script>
+    <script src="app/cardsController.js"></script>
+    <script src="app/services.js"></script>
+    <script src="app/directives.js"></script>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="assets/libs/html5shiv/3.7.2/html5shiv.min.js"></script>
+        <script src="assets/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body ng-controller="DefaultCtrl">
+
+    <div id="wrapper">
+
+        <!-- Navigation -->
+        <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#/">
+                    <span class="text-primary">
+                        <span class=" fa-stack ">
+                            <i class="fa fa-cloud fa-stack-2x"></i>
+                            <i class="fa fa-cog fa-stack-1x fa-inverse"></i>
+                        </span> Cloud Manager
+                    </span>
+                </a>
+            </div>
+            <!-- /.navbar-header -->
+
+            <ul class="nav navbar-top-links navbar-right">
+                <li>
+                    <span class="text-primary">{{sessionProperties.cloudName}}</span>
+
+                </li>
+                <li>
+                    <a href="doLogout">
+                        <i class="fa fa-sign-out fa-fw"></i> Logout
+                    </a>
+
+                </li>
+                <!-- /.dropdown -->
+            </ul>
+            <!-- /.navbar-top-links -->
+
+            <div class="navbar-default sidebar" role="navigation">
+                <div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+                        <li>
+                            <a class="active" href="#/"><i class="fa fa-dashboard fa-fw"></i> Dashboard</a>
+                        </li>
+                        <li>
+                            <a class="active" href="#/profile"><i class="fa fa-user fa-fw"></i> Personal Profile</a>
+                        </li>
+                        <li>
+                            <a class="active" href="#/cards"><i class="fa fa-file-o fa-rotate-270 fa-fw"></i> Cards</a>
+                        </li>
+                        <li>
+                            <a class="active" href="#/connections"><i class="fa fa-link fa-fw"></i> Connections</a>
+                        </li>
+                        <li>
+                            <a class="active" href="#/connectionTemplates"><i class="fa fa-link fa-fw"></i> Connection Templates</a>
+                        </li>
+                        <li>
+                            <a class="active" href="#/keys"><i class="fa fa-key fa-fw"></i> Keys</a>
+                        </li>
+                        <li>
+                            <a class="active" href="#/cloudStatus"><i class="fa fa-cogs fa-fw"></i> Cloud Status</a>
+                        </li>
+                    </ul>
+                </div>
+                <!-- /.sidebar-collapse -->
+            </div>
+            <!-- /.navbar-static-side -->
+        </nav>
+
+        <div id="page-wrapper" ng-view></div>
+
+
+    </div>
+    <!-- /#wrapper -->
+</body>
+
+</html>
+<!-- Template: http://startbootstrap.com/template-overviews/sb-admin-2/ -->

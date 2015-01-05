@@ -1,0 +1,195 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">{{card.tag ? sessionProperties.cloudName + '#' + card.tag : 'New Card'}}</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="alert alert-success" role="alert" ng-show="success">
+            <div class="row">
+                <div class="col-xs-2 text-center">
+                    <i class="fa fa-check fa-2x"></i>
+                </div>
+                <p class="col-xs-10">
+                    {{success}}
+                </p>
+            </div>
+        </div>
+
+        <div class="alert alert-danger" role="alert" ng-show="error">
+            <div class="row">
+                <div class="col-xs-2 text-center">
+                    <i class="fa fa-warning fa-2x"></i>
+                </div>
+                <p class="col-xs-10">
+                    {{error}}
+                </p>
+            </div>
+        </div>
+
+        <div class="alert alert-info" role="alert" ng-hide="card && profile && !inProgress">
+            <div class="row">
+                <div class="col-xs-2 text-center">
+                    <i class="fa fa-refresh fa-2x fa-spin"></i>
+                </div>
+                <p class="col-xs-10">
+                    Loading...
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-show="card && profile && !inProgress">
+    <div class="col-lg-8">
+        <form name="cardDetailsForm" role="form" ng-submit="submit()" novalidate>
+            <div class="row">
+                <div class="col-xs-12">
+                    <div class="form-group col-lg-11">
+                        <label>Card Shortcut</label>
+                        
+                        <div class="form-inline">
+                            <div class="form-group" ng-class="{'has-error': cardDetailsForm.cardTag.$error.cloudCardShortcut && validate}">
+                                <span>{{sessionProperties.cloudCardAppUrl}}{{sessionProperties.cloudName}}#</span>
+                                <input type="text" class="form-control input-sm" ng-model="card.tag" name="cardTag" cloud-card-shortcut ng-blur="validate=true" ng-model-options="{ debounce: 250 }" />
+                                <span class="help-block" ng-show="cardDetailsForm.cardTag.$error.cloudCardShortcut && validate">The shortcut should have only alphanumeric characters and -_. without spaces and should not be the same as other of your cards.</span>
+                            </div>
+
+                        </div>
+                        <span class="help-block">This makes it easier to remember your Cloud Card address.</span>
+
+                    </div>
+                    <div class="form-group col-lg-11">
+                        <label>Description</label>
+                        <input class="form-control input-sm" ng-model="card.description">
+                    </div>
+
+                    <div class="form-group col-lg-11">
+                        <label>Background Image</label>
+                        <input type="file" ng-file-select="onFileSelect($files)" accept="image/*">
+                        <span class="help-block">Image limit size is 512KB.</span>
+                    </div>
+                </div>
+            </div>
+            <div class="spacer15"></div>
+
+            <div class="row">
+                <div class="col-xs-12" ng-class="{'bg-info': showAddFields}">
+                    <div class="spacer5"></div>
+                    <button type="button" class="pull-right btn btn-primary" ng-model="showAddFields" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0"><i class="fa fa-plus-square"></i> Add Fields</button>
+                </div>
+            </div>
+            <div class="row" ng-show="showAddFields">
+                <div class="bg-info col-xs-12">
+                    <div class="spacer5"></div>
+                    <div class="col-xs-4" ng-repeat="field in availableFields">
+                        <button type="button" class="btn btn-primary btn-sm col-xs-10" ng-click="addField(field)">{{ cardFieldLabels[field] }}</button>
+                        <div class="spacer5"></div>
+                    </div>
+                    <div class="spacer5"></div>
+                </div>
+            </div>
+            <div class="spacer15"></div>
+
+            <div class="row">
+                <div class="bg-gray col-xs-12" ng-show="showSection('personalDetails')">
+                    <h4><strong>Personal Details</strong></h4>
+
+                    <card-field field="'firstName'"></card-field>
+                    <card-field field="'lastName'"></card-field>
+                    <card-field field="'nickname'"></card-field>
+
+                    <div class="form-group col-lg-11" ng-hide="card.fields['gender'].privacy == 'Only_me'">
+                        <label>{{cardFieldLabels.gender}}</label>
+                        <div class="pull-right vbottom">
+                            <div class="btn-group" dropdown>
+                                <button type="button" class="btn btn-primary btn-xs dropdown-toggle">
+                                    {{card.fields['gender'].privacy}} <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href ng-click="card.fields['gender'].privacy = 'Public'">Public</a>
+                                    </li>
+                                    <li><a href ng-click="card.fields['gender'].privacy = 'Private'">Private</a>
+                                    </li>
+                                </ul>
+                            </div>&nbsp;
+                            <button type="button" class="btn btn-danger btn-xs" ng-click="removeField('gender')"><i class="fa fa-minus"></i>
+                            </button>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" ng-model="card.fields.gender.value" value="Male">Male
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" ng-model="card.fields.gender.value" value="Female">Female
+                            </label>
+                        </div>
+                    </div>
+
+                    <card-field field="'birthDate'"></card-field>
+                    <card-field field="'nationality'"></card-field>
+                </div>
+                <div class="spacer15"></div>
+            </div>
+
+
+            <div class="row">
+                <div class="bg-gray col-xs-12" ng-show="showSection('contactInfo')">
+                    <h4><strong>Contact Info</strong></h4>
+
+                    <card-field field="'phone'"></card-field>
+                    <card-field field="'mobilePhone'"></card-field>
+                    <card-field field="'workPhone'"></card-field>
+                    <card-field field="'email'"></card-field>
+                    <card-field field="'website'"></card-field>
+                </div>
+                <div class="spacer15"></div>
+            </div>
+
+            <div class="row">
+                <div class="bg-gray  col-xs-12" ng-show="showSection('address')">
+                    <h4><strong>Address</strong></h4>
+
+                    <card-field field="'address_street'"></card-field>
+                    <card-field field="'address_postalCode'"></card-field>
+                    <card-field field="'address_locality'"></card-field>
+                    <card-field field="'address_region'"></card-field>
+                    <card-field field="'address_country'"></card-field>
+
+                </div>
+                <div class="spacer15"></div>
+            </div>
+
+            <div class="text-center">
+                <button class="btn btn-success" type="submit" ng-disabled="inProgress || cardDetailsForm.$invalid">Save</button>
+            </div>
+            <div class="spacer30"></div>
+        </form>
+    </div>
+</div>
+
+<script type="text/ng-template" id="card-field-edit.html">
+<div class="form-group col-lg-11" ng-hide="$parent.card.fields[field].privacy == 'Only_me'">
+    <label>{{$parent.cardFieldLabels[field]}}</label>
+    <div class="pull-right vbottom">
+        <div class="btn-group" dropdown>
+            <button type="button" class="btn btn-primary btn-xs dropdown-toggle">
+                {{$parent.card.fields[field].privacy}} <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu" role="menu">
+                <li><a href ng-click="$parent.card.fields[field].privacy = 'Public'">Public</a>
+                </li>
+                <li><a href ng-click="$parent.card.fields[field].privacy = 'Private'">Private</a>
+                </li>
+            </ul>
+        </div>&nbsp;
+        <button type="button" class="btn btn-danger btn-xs" ng-click="$parent.removeField(field)"><i class="fa fa-minus"></i></button>
+    </div>
+    <input class="form-control input-sm col-xs-10" ng-model="$parent.card.fields[field].value" placeholder="{{$parent.getProfileField(field)}}">
+</div>
+</script>

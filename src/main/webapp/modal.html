@@ -1,0 +1,12 @@
+<div>
+    <div class="modal-header">
+        <h4 class="modal-title">{{labels.modalTitle}}</h4>
+    </div>
+    <div class="modal-body" ng-show="labels.modalBody">
+        {{labels.modalBody}}
+    </div>
+    <div class="modal-footer">
+        <button class="btn btn-primary" ng-click="ok()">{{labels.modalOk}}</button>
+        <button class="btn btn-default" ng-click="cancel()">{{labels.modalCancel}}</button>
+    </div>
+</div>

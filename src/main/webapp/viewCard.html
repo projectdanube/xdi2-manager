@@ -1,0 +1,57 @@
+<div class="card-viewer" style="background-image: url(data:image/jpeg;base64,{{card.backgroundImage}});" dynamic-resize>
+
+    <span class="pull-right">
+        <a class="btn btn-default btn-sm" href ng-click="close()">
+        <i class="fa fa-close"></i> Close</a>
+    </span>
+    
+    
+    
+    
+    <div class="row">
+        <div class="col-xs-8 col-xs-offset-2 col-md-6 col-md-offset-3 card-content">
+            <h2>{{sessionProperties.cloudName}}#{{card.tag}}</h2>
+
+            <p>{{card.description}}</p>
+            <hr>
+
+            <card-view-field field="'firstName'"></card-view-field>
+            <card-view-field field="'lastName'"></card-view-field>
+            <card-view-field field="'nickname'"></card-view-field>
+            <card-view-field field="'gender'"></card-view-field>
+            <card-view-field field="'birthDate'"></card-view-field>
+            <card-view-field field="'nationality'"></card-view-field>
+
+            <card-view-field field="'phone'"></card-view-field>
+            <card-view-field field="'mobilePhone'"></card-view-field>
+            <card-view-field field="'workPhone'"></card-view-field>
+            <card-view-field field="'email'"></card-view-field>
+            <card-view-field field="'website'"></card-view-field>
+
+            <card-view-field field="'address_street'"></card-view-field>
+            <card-view-field field="'address_postalCode'"></card-view-field>
+            <card-view-field field="'address_locality'"></card-view-field>
+            <card-view-field field="'address_region'"></card-view-field>
+            <card-view-field field="'address_country'"></card-view-field>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <div class="pull-right">
+            <a href="{{url}}" class="btn btn-primary" role="button">Direct link to this card</a>
+        </div>
+    </div>
+
+    
+  
+
+</div>
+
+<script type="text/ng-template" id="card-field-view.html">
+    <div class="form-group" ng-show="$parent.card.fields[field].value">
+        <label>{{$parent.cardFieldLabels[field]}}</label>&nbsp;
+        <span ng-show="$parent.card.fields[field].privacy == 'PUBLIC'"><i class="fa fa-globe text-primary" tooltip="Public"></i></span>
+        <span ng-show="$parent.card.fields[field].privacy == 'PRIVATE'"><i class="fa fa-group text-primary" tooltip="Private"></i></span>
+        <p>{{$parent.card.fields[field].value}}</p>
+    </div>
+</script>

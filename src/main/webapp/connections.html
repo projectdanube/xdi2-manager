@@ -1,0 +1,198 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Connections</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+
+<div class="row">
+    <div class="col-lg-8">
+        <div class="alert alert-success" role="alert" ng-show="success">
+            <div class="row">
+                <div class="col-xs-2 text-center">
+                    <i class="fa fa-check fa-2x"></i>
+                </div>
+                <p class="col-xs-10">
+                    {{success}}
+                </p>
+            </div>
+        </div>
+
+        <div class="alert alert-danger" role="alert" ng-show="error">
+            <div class="row">
+                <div class="col-xs-2 text-center">
+                    <i class="fa fa-warning fa-2x"></i>
+                </div>
+                <p class="col-xs-10">
+                    {{error}}
+                </p>
+            </div>
+        </div>
+
+        <div class="alert alert-info" role="alert" ng-show="inProgress">
+            <div class="row">
+                <div class="col-xs-2 text-center">
+                    <i class="fa fa-refresh fa-2x fa-spin"></i>
+                </div>
+                <p class="col-xs-10">
+                    Loading...
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row" ng-hide="inProgress">
+    <div class="col-lg-8">
+
+        <div class="row">
+            <div class="col-lg-12">
+                <button type="button" class="pull-right btn btn-info" ng-click="prepareNewConnection()"><i class="fa fa-link"></i> New Connection</button>
+            </div>
+        </div>
+        <div class="spacer20"></div>
+
+        <div class="panel panel-info" ng-show="newConnection">
+            <div class="panel-heading">
+                <h3 class="panel-title">New Connection</h3>
+            </div>
+            <div class="panel-body">
+                <form role="form">
+
+                    <div class="form-group has-feedback" ng-class="{'has-error': cloudNameError, 'has-success': cloudNameOk}">
+                        <label class="control-label">Create a new connection with</label>
+                        <input type="text" class="form-control" placeholder="=" ng-model="newConnection.raCloudName">
+                        <span class="glyphicon glyphicon-ok form-control-feedback" ng-show="cloudNameOk"></span>
+                        <span class="help-block" ng-show="cloudNameError">{{cloudNameError}}</span>
+                    </div>
+
+                    <p>You will share:</p>
+                    <table class="table table-condensed table-hover table-bordered">
+                        <thead>
+                            <tr>
+                                <th>XDI</th>
+                                <th>Full Access</th>
+                                <th>Read</th>
+                                <th>Write</th>
+                                <th>Delete</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="p in newConnection.permissions">
+                                <td>
+                                    <input type="text" class="form-control" ng-model="p[0]">
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" ng-model="p[1]" ng-true-value="'all'">
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" ng-model="p[2]" ng-true-value="'get'">
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" ng-model="p[3]" ng-true-value="'set'">
+                                </td>
+                                <td class="text-center">
+                                    <input type="checkbox" ng-model="p[4]" ng-true-value="'del'">
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div>
+                        <button type="button" class="pull-right btn btn-default btn-sm" ng-click="addPermission()">Add</button>
+                    </div>
+                    <div class="spacer20"></div>
+
+                    <p>The other cloud will need the following authentication methods:</p>
+                    <div class="row">
+                        <div class="col-xs-10 col-xs-offset-2">
+                            <input type="checkbox" ng-model="newConnection.requireSignature">&nbsp;Valid signature
+                        </div>
+                        <div class="col-xs-10 col-xs-offset-2">
+                            <input type="checkbox" ng-model="newConnection.requireSecretToken">&nbsp;Valid secret token
+                        </div>
+                    </div>
+                    <div class="spacer20"></div>
+
+                    <div class="alert alert-danger" role="alert" ng-show="newConnectionError">
+                        <div class="row">
+                            <div class="col-xs-2 text-center">
+                                <i class="fa fa-warning fa-2x"></i>
+                            </div>
+                            <p class="col-xs-10">
+                                {{newConnectionError}}
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="pull-right">
+                        <button class="btn btn-primary" ng-click="createConnection()">Save</button>
+                        <button class="btn btn-default" ng-click="newConnection=null">Cancel</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <accordion close-others="false">
+            <accordion-group ng-repeat="c in connections | orderBy:'raCloudName'">
+                <accordion-heading>
+                    {{c.raCloudName || c.raCloudNumber || c.type}}
+                    <span class="pull-right">
+                        <!--i class="fa fa-pencil" ng-click="$rootScope.alert('Not Implemented')" ng-hide="c.type == 'ROOT'" stop-event></i-->&nbsp;
+                        <i class="fa fa-trash-o" ng-click="delete(c.id)" ng-hide="c.type == 'PUBLIC' || c.type == 'ROOT'" stop-event></i>
+                    </span>
+                </accordion-heading>
+
+                <p>
+                    <span ng-show="c.type == 'ROOT'">
+                    Should it be hidden?
+                </span>
+                    <span ng-show="c.type == 'PUBLIC'">
+                    Everyone has access to the following information in your cloud
+                </span>
+                    <span ng-show="c.type == 'GENERIC'">
+                    <a href="#" tooltip="{{c.raCloudNumber}}" ng-show="c.raCloudName">{{c.raCloudName}}</a>
+                    <span ng-hide="c.raCloudName">{{c.raCloudNumber}}</span> has access to the following information in your cloud
+                    </span>
+                </p>
+
+                <table class="table table-condensed table-hover table-bordered">
+                    <thead>
+                        <tr>
+                            <th>XDI</th>
+                            <th>Full Access</th>
+                            <th>Read</th>
+                            <th>Write</th>
+                            <th>Delete</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="(s, p) in c.permissions">
+                            <td><samp><small>{{s}}</small></samp>
+                            </td>
+                            <td class="text-center"><i class="fa fa-check" ng-show="p.indexOf('all') != -1"></i>
+                            </td>
+                            <td class="text-center"><i class="fa fa-check" ng-show="p.indexOf('get') != -1"></i>
+                            </td>
+                            <td class="text-center"><i class="fa fa-check" ng-show="p.indexOf('set') != -1"></i>
+                            </td>
+                            <td class="text-center"><i class="fa fa-check" ng-show="p.indexOf('del') != -1"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p>
+                    <button type="button" class="btn btn-info" ng-model="c.showXdi" btn-checkbox btn-checkbox-true="1" btn-checkbox-false="0">Show XDI</button>
+                    <br>
+                    <pre ng-show="c.showXdi"><samp><small>{{c.xdi}}</small></samp></pre>
+                </p>
+            </accordion-group>
+
+
+        </accordion>
+
+
+    </div>
+</div>
+
