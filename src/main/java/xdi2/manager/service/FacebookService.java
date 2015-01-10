@@ -1,0 +1,136 @@
+package xdi2.manager.service;
+
+import java.io.IOException;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import xdi2.client.exceptions.Xdi2ClientException;
+import xdi2.connector.facebook.api.FacebookApi;
+import xdi2.connector.facebook.mapping.FacebookMapping;
+import xdi2.connector.facebook.util.GraphUtil;
+import xdi2.core.constants.XDIAuthenticationConstants;
+import xdi2.core.constants.XDIConstants;
+import xdi2.core.syntax.XDIAddress;
+import xdi2.core.syntax.XDIStatement;
+import xdi2.manager.controller.FacebookController;
+import xdi2.manager.model.CloudUser;
+import xdi2.manager.model.FacebookConnect;
+import xdi2.messaging.Message;
+import xdi2.messaging.MessageCollection;
+import xdi2.messaging.MessageEnvelope;
+import xdi2.messaging.MessageResult;
+
+@Service
+public class FacebookService {
+	private static final Logger log = LoggerFactory.getLogger(FacebookService.class);
+
+	@Autowired
+	FacebookApi facebookApi;
+
+	@Autowired
+	FacebookMapping facebookMapping;
+
+	public FacebookConnect getFacebookConnectStatus() throws Xdi2ClientException, IOException {
+		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		FacebookConnect facebookConnect = new FacebookConnect();
+
+		// Generate the OAuth URL
+		String oAuthUrl = facebookApi.startOAuth(null, generateOAuthReturnUrl(), user.getCloudNumber().getXDIAddress());
+		log.debug("Facebook OAuth URL " + oAuthUrl);
+		facebookConnect.setoAuthUrl(oAuthUrl);
+
+		// Get User Id and Access Token
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = messageEnvelope.getMessageCollection(user.getCloudNumber().getXDIAddress(), true);
+		Message message = messageCollection.createMessage();
+		message = user.prepareMessageToCloud(message);
+		message.createGetOperation(FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT);
+		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+
+		XDIAddress facebookUserIdXri = GraphUtil.retrieveFacebookUserIdXri(messageResult.getGraph(), user.getCloudNumber().getXDIAddress());
+		if (facebookUserIdXri != null) {
+
+			String facebookAccessToken = GraphUtil.retrieveFacebookAccessToken(messageResult.getGraph(), facebookUserIdXri);
+
+			facebookConnect.setUserId(facebookUserIdXri.toString());
+			facebookConnect.setAccessToken(facebookAccessToken);
+
+			log.debug(user.getCloudName() + " is connected to facebook (" + facebookUserIdXri.toString() + ") with token " + facebookAccessToken);
+		}
+
+		return facebookConnect;
+	}	
+
+	public void handleFacebookOAuthResponse(String code, String state) throws Exception {
+		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		log.debug("Got response from facebook: " + code);
+
+		facebookApi.checkState(state, user.getCloudNumber().getXDIAddress());
+
+		String facebookAccessToken = facebookApi.exchangeCodeForAccessToken(generateOAuthReturnUrl(), code);
+		if (facebookAccessToken == null) throw new Exception("No access token received.");
+
+		String facebookUserId = facebookApi.retrieveUserId(facebookAccessToken);
+		XDIAddress facebookUserIdXri = facebookMapping.facebookUserIdToFacebookUserIdXri(facebookUserId);
+		
+		// Facebook User Id ex: (https://facebook.com/)[=]!1111/$ref/(https://facebook.com/)[=]!10205481317089832
+		XDIStatement facebookUserIdStatement = XDIStatement.create(FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + user.getCloudNumber().toString() + "/$ref/" + FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + facebookUserIdXri);
+		
+		// Facebook OAuth Token ex: (https://facebook.com/)[=]!10205481317089832<$oauth><$token>&/&/"dfasdhfgasdfaghsdf"
+		XDIStatement facebookAccessTokenStatement = XDIStatement.create("" + FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + facebookUserIdXri + XDIAuthenticationConstants.XDI_ADD_OAUTH_TOKEN + XDIConstants.XDI_ADD_VALUE + "/&/\"" + facebookAccessToken + "\"");
+
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = messageEnvelope.getMessageCollection(user.getCloudNumber().getXDIAddress(), true);
+		Message message = messageCollection.createMessage();
+		message = user.prepareMessageToCloud(message);
+		message.createSetOperation(facebookUserIdStatement);
+		message.createSetOperation(facebookAccessTokenStatement);
+
+		user.getXdiClient().send(messageEnvelope, null);
+
+	}
+
+	public void revokeFacebookConnect() throws Xdi2ClientException, IOException, JSONException {
+		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		FacebookConnect facebookConnect = getFacebookConnectStatus();
+		
+		if (facebookConnect.getAccessToken() != null) {
+			facebookApi.revokeAccessToken(facebookConnect.getAccessToken());
+			
+			XDIAddress facebookAccessTokenXdiAddress = XDIAddress.create("" + FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + facebookConnect.getUserId() + XDIAuthenticationConstants.XDI_ADD_OAUTH_TOKEN + XDIConstants.XDI_ADD_VALUE);
+			XDIAddress facebookUserIdXdiAddress = XDIAddress.create("" + FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + user.getCloudNumber());
+
+			MessageEnvelope messageEnvelope = new MessageEnvelope();
+			MessageCollection messageCollection = messageEnvelope.getMessageCollection(user.getCloudNumber().getXDIAddress(), true);
+			Message message = messageCollection.createMessage();
+			message = user.prepareMessageToCloud(message);
+			message.createDelOperation(facebookAccessTokenXdiAddress);
+			message.createDelOperation(facebookUserIdXdiAddress);
+
+			user.getXdiClient().send(messageEnvelope, null);
+			
+		}
+	}
+
+	private String generateOAuthReturnUrl() {
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+		
+		String returnUrl = request.getRequestURL().toString().replace(request.getRequestURI(), "") + request.getContextPath();
+		returnUrl += FacebookController.OAUTH_RETURN_URL;
+		log.debug("Facebook OAuth return url: " + returnUrl);
+		
+		return returnUrl;
+	}
+	
+
+}

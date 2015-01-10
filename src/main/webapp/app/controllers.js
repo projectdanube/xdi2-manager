@@ -491,6 +491,73 @@ controllers.controller("KeysCtrl", ['$scope', 'Key', '$anchorScroll', '$modal',
 
   }]);
 
+controllers.controller("FacebookCtrl", ['$scope', '$http', '$modal', '$sce',
+  function ($scope, $http, $modal, $sce) {
+
+        var refresh = function () {
+            $scope.inProgress = true;
+            $http.get('api/1.0/cloud/facebook/')
+                .success(function (data) {
+                    $scope.facebookConnector = data;
+                    $scope.facebookConnector.secureOAuthUrl = $sce.trustAsResourceUrl($scope.facebookConnector.oAuthUrl + '&display=popup');
+                    $scope.inProgress = false;
+                })
+                .error(function (data) {
+                    $scope.facebookConnector = {};
+                    $scope.inProgress = false;
+                });
+        };
+
+        $scope.revoke = function () {
+            $scope.inProgress = true;
+            $http.delete('api/1.0/cloud/facebook/')
+                .success(function (data) {
+                    $scope.success = "Facebook connection deleted";
+                    refresh();
+                })
+                .error(function (data) {
+                    $scope.error = "Error deleting facebook connection";
+                    $scope.inProgress = false;
+                });
+
+        };
+
+
+        $scope.connect = function () {
+
+            $scope.success = null;
+            $scope.error = null;
+
+            var winWidth = 520;
+            var winHeight = 350;
+            var winTop = (screen.height / 2) - (winHeight / 2);
+            var winLeft = (screen.width / 2) - (winWidth / 2);
+            window.open($scope.facebookConnector.secureOAuthUrl, 'fb', 'top=' + winTop + ',left=' + winLeft + ',toolbar=0,status=0,width=' + winWidth + ',height=' + winHeight);
+
+            var wait = function () {
+
+                if (_.isNull($scope.facebookConnector.userId) === false) {
+                    clearInterval(waitInterval);
+                }
+                refresh();
+
+            };
+
+            var waitInterval = setInterval(wait, 3000);
+
+
+
+        };
+
+
+        refresh();
+
+
+
+
+  }]);
+
+
 controllers.controller("GenericModalCtrl", ['$scope', '$modalInstance', 'labels',
   function ($scope, $modalInstance, labels) {
 

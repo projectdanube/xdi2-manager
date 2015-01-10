@@ -24,6 +24,10 @@ CloudDashboardApp.config(['$routeProvider', '$resourceProvider', '$httpProvider'
             controller: 'ProfileCtrl',
             templateUrl: 'profile.html'
         }).
+        when('/facebook', {
+            controller: 'FacebookCtrl',
+            templateUrl: 'facebook.html'
+        }).
         when('/connections', {
             controller: 'ConnectionsCtrl',
             templateUrl: 'connections.html'
