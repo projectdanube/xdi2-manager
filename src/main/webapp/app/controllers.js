@@ -519,7 +519,6 @@ controllers.controller("FacebookCtrl", ['$scope', '$http', '$modal', '$sce',
                     $scope.error = "Error deleting facebook connection";
                     $scope.inProgress = false;
                 });
-
         };
 
 
@@ -535,25 +534,16 @@ controllers.controller("FacebookCtrl", ['$scope', '$http', '$modal', '$sce',
             window.open($scope.facebookConnector.secureOAuthUrl, 'fb', 'top=' + winTop + ',left=' + winLeft + ',toolbar=0,status=0,width=' + winWidth + ',height=' + winHeight);
 
             var wait = function () {
-
                 if (_.isNull($scope.facebookConnector.userId) === false) {
                     clearInterval(waitInterval);
                 }
                 refresh();
-
             };
 
             var waitInterval = setInterval(wait, 3000);
-
-
-
         };
-
-
+      
         refresh();
-
-
-
 
   }]);
 

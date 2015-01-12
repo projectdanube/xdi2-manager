@@ -5,6 +5,7 @@ public class CardField {
 	private String xdiStatement;
 	private String value;
 	private CardFieldPrivacy privacy;
+	private CardFieldLink linked; 
 	
 	public CardField() {
 		super();
@@ -34,6 +35,12 @@ public class CardField {
 	}
 	public void setPrivacy(CardFieldPrivacy privacy) {
 		this.privacy = privacy;
+	}
+	public CardFieldLink getLinked() {
+		return linked;
+	}
+	public void setLinked(CardFieldLink linked) {
+		this.linked = linked;
 	}
 	
 }

@@ -94,17 +94,28 @@ controllers.controller("CardsCtrl", ['$scope', 'Card', '$modal', '$anchorScroll'
 
   }]);
 
-controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeParams', '$location', '$anchorScroll', '$upload',
-  function ($scope, Card, Profile, $routeParams, $location, $anchorScroll, $upload) {
+controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeParams', '$location', '$anchorScroll', '$upload', '$http',
+  function ($scope, Card, Profile, $routeParams, $location, $anchorScroll, $upload, $http) {
 
         $scope.cardFieldLabels = $scope.$parent.cardFieldLabels;
 
+        // Load personal profile
         Profile.get(function (data) {
             $scope.profile = data;
         }, function (error) {
             $scope.error = "Error comunicating with the server, please try again.";
         });
 
+        // Load Facebook profile
+        $http.get('api/1.0/cloud/facebook/profile/')
+            .success(function (data) {
+                $scope.facebookProfile = data;
+            })
+            .error(function (data) {
+                $scope.facebookProfile = {};
+            });
+
+        // Load card either from the graph or a blank one
         if ($routeParams.cardId) {
             // Card edit
             Card.get({
@@ -114,17 +125,17 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
 
                 $scope.availableFields = _.keys($scope.cardFieldLabels);
                 $scope.usedFields = [];
+                
+                $scope.card = data;
 
-                _.forOwn(data.fields, function (field, key) {
-                    field.privacy = _.capitalize(field.privacy.toLowerCase());
-
+                prepareFieldsForView();
+                _.forOwn($scope.card.fields, function (field, key) {
                     if (field.privacy === "Public" || field.privacy === "Private") {
                         $scope.addField(key);
                     }
-
                 });
 
-                $scope.card = data;
+                
                 $scope.currentTag = $scope.card.tag;
             }, function (error) {
                 $scope.error = "Error comunicating with the server, please try again.";
@@ -135,7 +146,8 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
             _.keys($scope.cardFieldLabels).forEach(function (e) {
                 fields[e] = {
                     "value": null,
-                    "privacy": "Only_me"
+                    "privacy": "Only_me",
+                    "linked": null
                 };
             });
 
@@ -155,7 +167,9 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
             });
 
             if (_.isUndefined($scope.card) === false && _.isUndefined($scope.card.fields[field]) === false) {
-                $scope.card.fields[field].privacy = "Private";
+                if ($scope.card.fields[field].privacy !== 'Public') {
+                    $scope.card.fields[field].privacy = "Private";
+                }
             }
             $scope.usedFields = _.union($scope.usedFields, element);
         };
@@ -205,35 +219,45 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
         var prepareFieldsForView = function () {
             _.forOwn($scope.card.fields, function (field, key) {
                 field.privacy = _.capitalize(field.privacy.toLowerCase());
+                
+                 if (field.linked !== null) {
+                    field.value = null;
+                }
             });
         };
         var prepareFieldsForSubmit = function () {
-            _.forOwn($scope.card.fields, function (field, key) {
+            var card = angular.copy($scope.card);
+            
+            _.forOwn(card.fields, function (field, key) {
                 field.privacy = field.privacy.toUpperCase();
+                
+                if (field.linked === 'FACEBOOK' && $scope.isFacebookField(key)) {
+                    field.value = $scope.facebookProfile[key].xdiAddress;
+                }
             });
+            
+            return card;
         };
 
 
         $scope.submit = function () {
             if (!angular.isDefined($scope.card)) return;
 
-            prepareFieldsForSubmit();
+            var card = prepareFieldsForSubmit();
 
             $scope.inProgress = true;
 
             $anchorScroll();
-            if ($scope.card.id) {
+            if (card.id) {
                 // Card edit
-
-
                 $scope.upload = $upload.upload({
-                    url: 'api/1.0/cloud/cards/' + $scope.card.id,
+                    url: 'api/1.0/cloud/cards/' + card.id,
                     method: 'POST',
                     headers: {
                         'header-key': 'header-value'
                     },
                     data: {
-                        card: $scope.card
+                        card: card
                     },
                     file: $scope.file
                 }).progress(function (evt) {
@@ -250,8 +274,6 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
 
             } else {
                 // New Card
-
-
                 $scope.upload = $upload.upload({
                     url: 'api/1.0/cloud/cards/',
                     method: 'POST',
@@ -259,7 +281,7 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
                         'header-key': 'header-value'
                     },
                     data: {
-                        card: $scope.card
+                        card: card
                     },
                     file: $scope.file
                 }).progress(function (evt) {
@@ -290,6 +312,10 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
                 }
             }
         };
+
+        $scope.isFacebookField = function (field) {
+            return _.indexOf(_.keys($scope.facebookProfile), field) >= 0 ? true : false;
+        }
 
   }]);
 

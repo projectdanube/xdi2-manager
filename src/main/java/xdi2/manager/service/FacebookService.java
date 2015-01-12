@@ -1,6 +1,9 @@
 package xdi2.manager.service;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,13 +20,18 @@ import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.connector.facebook.api.FacebookApi;
 import xdi2.connector.facebook.mapping.FacebookMapping;
 import xdi2.connector.facebook.util.GraphUtil;
+import xdi2.core.Graph;
+import xdi2.core.Literal;
 import xdi2.core.constants.XDIAuthenticationConstants;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.syntax.XDIAddress;
 import xdi2.core.syntax.XDIStatement;
+import xdi2.core.util.XDIAddressUtil;
 import xdi2.manager.controller.FacebookController;
 import xdi2.manager.model.CloudUser;
 import xdi2.manager.model.FacebookConnect;
+import xdi2.manager.model.FacebookProfile;
+import xdi2.manager.model.FacebookProfileField;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageCollection;
 import xdi2.messaging.MessageEnvelope;
@@ -32,6 +40,25 @@ import xdi2.messaging.MessageResult;
 @Service
 public class FacebookService {
 	private static final Logger log = LoggerFactory.getLogger(FacebookService.class);
+
+	public static final XDIAddress XDI_ADD_FACEBOOK_FIRST_NAME = XDIAddress.create("#(user)<#(first_name)>&");
+	public static final XDIAddress XDI_ADD_FACEBOOK_LAST_NAME = XDIAddress.create("#(user)<#(last_name)>&");
+	public static final XDIAddress XDI_ADD_FACEBOOK_GENDER = XDIAddress.create("#(user)<#(gender)>&");
+	public static final XDIAddress XDI_ADD_FACEBOOK_EMAIL = XDIAddress.create("#(user)<#(email)>&");
+	public static final XDIAddress XDI_ADD_FACEBOOK_WEBSITE = XDIAddress.create("#(user)<#(website)>&");
+	public static final XDIAddress XDI_ADD_FACEBOOK_BIRTHDAY = XDIAddress.create("#(user)<#(birthday)>&");
+
+    public static final Map<String, XDIAddress> XDI_FACEBOOK_PROFILE;
+    static {
+    	Map<String, XDIAddress> xdiFacebookProfile = new HashMap<String, XDIAddress>();
+    	xdiFacebookProfile.put("firstName", XDI_ADD_FACEBOOK_FIRST_NAME);
+    	xdiFacebookProfile.put("lastName", XDI_ADD_FACEBOOK_LAST_NAME);
+    	xdiFacebookProfile.put("gender", XDI_ADD_FACEBOOK_GENDER);
+    	xdiFacebookProfile.put("birthDate", XDI_ADD_FACEBOOK_BIRTHDAY);
+    	xdiFacebookProfile.put("email", XDI_ADD_FACEBOOK_EMAIL);
+    	xdiFacebookProfile.put("website", XDI_ADD_FACEBOOK_WEBSITE);
+    	XDI_FACEBOOK_PROFILE = Collections.unmodifiableMap(xdiFacebookProfile);
+    }
 
 	@Autowired
 	FacebookApi facebookApi;
@@ -130,6 +157,47 @@ public class FacebookService {
 		log.debug("Facebook OAuth return url: " + returnUrl);
 		
 		return returnUrl;
+	}
+	
+	public FacebookProfile getFacebookProfile() throws Xdi2ClientException, IOException {
+		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		FacebookConnect facebookConnect = getFacebookConnectStatus();
+
+		FacebookProfile profile = new FacebookProfile();
+		
+		XDIAddress facebookContext = XDIAddress.create("" + FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + facebookConnect.getUserId());
+		
+		MessageEnvelope messageEnvelope = new MessageEnvelope();
+		MessageCollection messageCollection = messageEnvelope.getMessageCollection(user.getCloudNumber().getXDIAddress(), true);
+		Message message = messageCollection.createMessage();
+		message = user.prepareMessageToCloud(message);
+		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_FIRST_NAME));
+		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_LAST_NAME));
+		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_GENDER));
+		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_BIRTHDAY));
+		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_EMAIL));
+		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_WEBSITE));
+
+		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		
+		profile.setFirstName(generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_FIRST_NAME), messageResult.getGraph()));
+		profile.setLastName(generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_LAST_NAME), messageResult.getGraph()));
+		profile.setGender(generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_GENDER), messageResult.getGraph()));
+		profile.setBirthDate(generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_BIRTHDAY), messageResult.getGraph()));
+		profile.setEmail(generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_EMAIL), messageResult.getGraph()));
+		profile.setWebsite(generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_WEBSITE), messageResult.getGraph()));
+		
+		return profile;
+	}
+	
+	private FacebookProfileField generateFacebookField(XDIAddress fieldXdiAddress, Graph graph) {
+		
+		Literal l = graph.getRootContextNode().getDeepLiteral(fieldXdiAddress);
+		if (l != null) {
+			return new FacebookProfileField(l.getLiteralDataString(), fieldXdiAddress.toString());
+		}
+		
+		return null;
 	}
 	
 

@@ -50,7 +50,7 @@
                 <div class="col-xs-12">
                     <div class="form-group col-lg-11">
                         <label>Card Shortcut</label>
-                        
+
                         <div class="form-inline">
                             <div class="form-group" ng-class="{'has-error': cardDetailsForm.cardTag.$error.cloudCardShortcut && validate}">
                                 <span>{{sessionProperties.cloudCardAppUrl}}{{sessionProperties.cloudName}}#</span>
@@ -107,6 +107,20 @@
                         <div class="pull-right vbottom">
                             <div class="btn-group" dropdown>
                                 <button type="button" class="btn btn-primary btn-xs dropdown-toggle">
+                                    Link with {{card.fields['gender'].linked}} <span class="caret"></span>
+                                </button>
+                                <ul class="dropdown-menu" role="menu">
+                                    <li><a href ng-click="card.fields['gender'].linked = null">Not Linked</a>
+                                    </li>
+                                    <li><a href ng-click="card.fields['gender'].linked = 'PROFILE'">Profile</a>
+                                    </li>
+                                    <li ng-show="isFacebookField('gender')"><a href ng-click="card.fields['gender'].linked = 'FACEBOOK'">Facebook</a>
+                                    </li>
+                                </ul>
+                            </div>&nbsp;
+                            
+                            <div class="btn-group" dropdown>
+                                <button type="button" class="btn btn-primary btn-xs dropdown-toggle">
                                     {{card.fields['gender'].privacy}} <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
@@ -130,7 +144,7 @@
                             </label>
                         </div>
                     </div>
-
+   
                     <card-field field="'birthDate'"></card-field>
                     <card-field field="'nationality'"></card-field>
                 </div>
@@ -174,22 +188,38 @@
 </div>
 
 <script type="text/ng-template" id="card-field-edit.html">
-<div class="form-group col-lg-11" ng-hide="$parent.card.fields[field].privacy == 'Only_me'">
-    <label>{{$parent.cardFieldLabels[field]}}</label>
-    <div class="pull-right vbottom">
-        <div class="btn-group" dropdown>
-            <button type="button" class="btn btn-primary btn-xs dropdown-toggle">
-                {{$parent.card.fields[field].privacy}} <span class="caret"></span>
+    <div class="form-group col-lg-11" ng-hide="$parent.card.fields[field].privacy == 'Only_me'">
+        <label>{{$parent.cardFieldLabels[field]}}</label>
+        <div class="pull-right vbottom">
+            <div class="btn-group" dropdown>
+                <button type="button" class="btn btn-primary btn-xs dropdown-toggle">
+                    Link with {{$parent.card.fields[field].linked}} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href ng-click="$parent.card.fields[field].linked = null">Not Linked</a>
+                    </li>
+                    <li><a href ng-click="$parent.card.fields[field].linked = 'PROFILE'">Profile</a>
+                    </li>
+                    <li ng-show="$parent.isFacebookField(field)"><a href ng-click="$parent.card.fields[field].linked = 'FACEBOOK'">Facebook</a>
+                    </li>
+                </ul>
+            </div>&nbsp;
+            <div class="btn-group" dropdown>
+                <button type="button" class="btn btn-primary btn-xs dropdown-toggle">
+                    {{$parent.card.fields[field].privacy}} <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu" role="menu">
+                    <li><a href ng-click="$parent.card.fields[field].privacy = 'Public'">Public</a>
+                    </li>
+                    <li><a href ng-click="$parent.card.fields[field].privacy = 'Private'">Private</a>
+                    </li>
+                </ul>
+            </div>&nbsp;
+            <button type="button" class="btn btn-danger btn-xs" ng-click="$parent.removeField(field)"><i class="fa fa-minus"></i>
             </button>
-            <ul class="dropdown-menu" role="menu">
-                <li><a href ng-click="$parent.card.fields[field].privacy = 'Public'">Public</a>
-                </li>
-                <li><a href ng-click="$parent.card.fields[field].privacy = 'Private'">Private</a>
-                </li>
-            </ul>
-        </div>&nbsp;
-        <button type="button" class="btn btn-danger btn-xs" ng-click="$parent.removeField(field)"><i class="fa fa-minus"></i></button>
+        </div>
+        <input class="form-control input-sm col-xs-10" ng-model="$parent.card.fields[field].value" ng-show="$parent.card.fields[field].linked == null">
+        <input class="form-control input-sm col-xs-10" ng-model="$parent.card.fields[field].value" placeholder="{{$parent.getProfileField(field)}}" ng-show="$parent.card.fields[field].linked == 'PROFILE'" ng-change="$parent.card.fields[field].linked = null">
+        <input class="form-control input-sm col-xs-10" ng-model="$parent.card.fields[field].value" placeholder="{{$parent.facebookProfile[field].value}}" ng-show="$parent.card.fields[field].linked == 'FACEBOOK'" ng-change="$parent.card.fields[field].linked = null">
     </div>
-    <input class="form-control input-sm col-xs-10" ng-model="$parent.card.fields[field].value" placeholder="{{$parent.getProfileField(field)}}">
-</div>
 </script>

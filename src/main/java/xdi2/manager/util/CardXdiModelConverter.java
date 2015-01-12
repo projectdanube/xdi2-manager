@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import xdi2.client.exceptions.Xdi2ClientException;
+import xdi2.connector.facebook.mapping.FacebookMapping;
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
 import xdi2.core.Literal;
@@ -29,10 +30,12 @@ import xdi2.core.util.XDIStatementUtil;
 import xdi2.core.util.iterators.ReadOnlyIterator;
 import xdi2.manager.model.Card;
 import xdi2.manager.model.CardField;
+import xdi2.manager.model.CardFieldLink;
 import xdi2.manager.model.CardFieldPrivacy;
 import xdi2.manager.model.CloudUser;
 import xdi2.manager.service.CloudService;
 import xdi2.manager.service.Configuration;
+import xdi2.manager.service.FacebookService;
 
 @Component
 public class CardXdiModelConverter {
@@ -109,23 +112,9 @@ public class CardXdiModelConverter {
 		}
 
 		// get profile info
-		card.putField("firstName", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_FIRST_NAME));
-		card.putField("lastName", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_LAST_NAME));
-		card.putField("nickname", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_NICKNAME));
-		card.putField("gender", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_GENDER));
-		card.putField("birthDate", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_BIRTH_DATE));
-		card.putField("nationality", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_NATIONALITY));
-		card.putField("phone", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_PHONE));
-		card.putField("mobilePhone", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_MOBILE_PHONE));
-		card.putField("workPhone", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_WORK_PHONE));
-		card.putField("email", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_EMAIL));
-		card.putField("website", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_WEBSITE));
-
-		card.putField("address_street", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_ADDRESS_STREET));
-		card.putField("address_postalCode", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_ADDRESS_POSTAL_CODE));
-		card.putField("address_locality", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_ADDRESS_LOCALITY));
-		card.putField("address_region", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_ADDRESS_REGION));
-		card.putField("address_country", convertXdiToCardField(cardXdi, XdiModelConverter.XDI_ADDRESS_COUNTRY));
+		for (String key : XdiModelConverter.XDI_PROFILE.keySet()) {			
+			card.putField(key, convertXdiToCardField(cardXdi, XdiModelConverter.XDI_PROFILE.get(key)));
+		}
 
 		return card;
 	}
@@ -156,8 +145,11 @@ public class CardXdiModelConverter {
 		}
 		else {
 			Relation ref = fieldContextNode.getRelation(XDIAddress.create("$ref"));
-			if (ref != null) {
+			if (ref != null) {				
+				String refTarget = ref.toString().substring(ref.toString().indexOf("$ref/") + 5);
+				field.setLinked(refTarget.startsWith(FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT.toString()) ? CardFieldLink.FACEBOOK : CardFieldLink.PROFILE);
 				field.setXdiStatement(ref.toString());
+				field.setValue(refTarget);
 			}
 			else {
 				log.debug("Address is not literal neither $ref, What is it? " + fieldContextNode.getGraph().toString("XDI DISPLAY", null));
@@ -189,24 +181,10 @@ public class CardXdiModelConverter {
 		addStatement(statements, XDIAddressUtil.concatXDIAddresses(cardXdiAddress, XDI_CARD_BACKGROUND_IMAGE), card.getBackgroundImage());
 		
 		addCardButtonMessages(statements, cardXdiAddress);
-
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_FIRST_NAME, card.getField("firstName"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_LAST_NAME, card.getField("lastName"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_NICKNAME, card.getField("nickname"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_GENDER, card.getField("gender"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_BIRTH_DATE, card.getField("birthDate"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_NATIONALITY, card.getField("nationality"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_PHONE, card.getField("phone"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_MOBILE_PHONE, card.getField("mobilePhone"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_WORK_PHONE, card.getField("workPhone"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_EMAIL, card.getField("email"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_WEBSITE, card.getField("website"));
-
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_ADDRESS_STREET, card.getField("address_street"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_ADDRESS_POSTAL_CODE, card.getField("address_postalCode"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_ADDRESS_LOCALITY, card.getField("address_locality"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_ADDRESS_REGION, card.getField("address_region"));
-		addStatement(statements, cardXdiAddress, user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_ADDRESS_COUNTRY, card.getField("address_country"));
+		
+		for (String key : card.getFields().keySet()) {
+			addStatement(statements, cardXdiAddress, card, key);
+		}
 		
 		// Put card's public info in Public LC
 		statements.addAll(getCardInPublicLCStatement(cardXdiAddress, card));
@@ -227,7 +205,10 @@ public class CardXdiModelConverter {
 		statements.add(XDIStatementUtil.concatXDIStatement(fieldXdi, XDIStatement.create("/&/" + "\"" + value + "\"")));
 	}
 
-	private void addStatement (List<XDIStatement> statements, XDIAddress cardXdiAddress, XDIAddress profileXdiAddress, XDIAddress fieldXdi, CardField cardField) {
+	private void addStatement (List<XDIStatement> statements, XDIAddress cardXdiAddress, Card card, String key) {
+		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+		CardField cardField = card.getField(key);
 		if (cardField == null) {
 			return;
 		}
@@ -235,10 +216,10 @@ public class CardXdiModelConverter {
 		XDIAddress cardFieldXdiAddress = null;
 		switch (cardField.getPrivacy()) {
 		case PRIVATE:
-			cardFieldXdiAddress = XDIAddressUtil.concatXDIAddresses(cardXdiAddress, XDI_CARD_PRIVATE, fieldXdi);
+			cardFieldXdiAddress = XDIAddressUtil.concatXDIAddresses(cardXdiAddress, XDI_CARD_PRIVATE, XdiModelConverter.XDI_PROFILE.get(key));
 			break;
 		case PUBLIC:
-			cardFieldXdiAddress = XDIAddressUtil.concatXDIAddresses(cardXdiAddress, XDI_CARD_PUBLIC, fieldXdi);
+			cardFieldXdiAddress = XDIAddressUtil.concatXDIAddresses(cardXdiAddress, XDI_CARD_PUBLIC, XdiModelConverter.XDI_PROFILE.get(key));
 			break;
 		case ONLY_ME:
 		default:
@@ -246,9 +227,15 @@ public class CardXdiModelConverter {
 		}
 
 		XDIStatement statement = null;
-		if (StringUtils.isBlank(cardField.getValue())) {
-			XDIAddress profileFieldXdiAddress = XDIAddressUtil.concatXDIAddresses(profileXdiAddress, fieldXdi);
+		if (CardFieldLink.PROFILE.equals(cardField.getLinked())) {
+			XDIAddress profileFieldXdiAddress = XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XdiModelConverter.XDI_PROFILE.get(key));
 			statement = XDIStatementUtil.concatXDIStatement(cardFieldXdiAddress, XDIStatement.create("/$ref/" + profileFieldXdiAddress.toString()));
+		}
+		else if (CardFieldLink.FACEBOOK.equals(cardField.getLinked()))  {
+			XDIAddress facebookFieldAddress = FacebookService.XDI_FACEBOOK_PROFILE.get(key);
+			if (facebookFieldAddress == null) return; //ignore it
+
+			statement = XDIStatementUtil.concatXDIStatement(cardFieldXdiAddress, XDIStatement.create("/$ref/" + cardField.getValue()));
 		}
 		else {
 			statement = XDIStatementUtil.concatXDIStatement(cardFieldXdiAddress, XDIStatement.create("/&/\"" + cardField.getValue() + "\""));

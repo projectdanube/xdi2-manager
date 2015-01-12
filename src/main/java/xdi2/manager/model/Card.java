@@ -5,6 +5,9 @@ import java.util.Map;
 
 import xdi2.manager.util.XdiUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Card {
 
 	@SuppressWarnings("unused")

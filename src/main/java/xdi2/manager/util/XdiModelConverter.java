@@ -1,7 +1,10 @@
 package xdi2.manager.util;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.CollectionUtils;
@@ -62,6 +65,30 @@ public class XdiModelConverter {
 	public static XDIAddress XDI_ADDRESS_POSTAL_CODE = XDIAddress.create("#address<#postal><#code>&");
 	public static XDIAddress XDI_ADDRESS_REGION = XDIAddress.create("#address<#region>&");
 
+	
+    public static final Map<String, XDIAddress> XDI_PROFILE;
+    static {
+    	Map<String, XDIAddress> xdiProfile = new HashMap<String, XDIAddress>();
+    	xdiProfile.put("firstName", XDI_FIRST_NAME);
+    	xdiProfile.put("lastName", XDI_LAST_NAME);
+    	xdiProfile.put("nickname", XDI_NICKNAME);
+    	xdiProfile.put("gender", XDI_GENDER);
+    	xdiProfile.put("birthDate", XDI_BIRTH_DATE);
+    	xdiProfile.put("nationality", XDI_NATIONALITY);
+    	xdiProfile.put("phone", XDI_PHONE);
+    	xdiProfile.put("mobilePhone", XDI_MOBILE_PHONE);
+    	xdiProfile.put("workPhone", XDI_WORK_PHONE);
+    	xdiProfile.put("email", XDI_EMAIL);
+    	xdiProfile.put("website", XDI_WEBSITE);
+    	xdiProfile.put("address_street", XDI_ADDRESS_STREET);
+    	xdiProfile.put("address_postalCode", XDI_ADDRESS_POSTAL_CODE);
+    	xdiProfile.put("address_locality", XDI_ADDRESS_LOCALITY);
+    	xdiProfile.put("address_region", XDI_ADDRESS_REGION);
+    	xdiProfile.put("address_country", XDI_ADDRESS_COUNTRY);
+    	XDI_PROFILE = Collections.unmodifiableMap(xdiProfile);
+    }
+	
+	
 	@Autowired
 	private ReverseNameResolutionService reverseNameResolutionService;
 

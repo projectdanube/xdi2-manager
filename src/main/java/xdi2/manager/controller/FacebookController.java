@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.manager.model.FacebookConnect;
+import xdi2.manager.model.FacebookProfile;
 import xdi2.manager.service.FacebookService;
 
 @Controller
@@ -38,6 +39,12 @@ public class FacebookController extends AbstractController {
 	@RequestMapping(value = "/api/1.0/cloud/facebook/", method = RequestMethod.DELETE)
 	public void revokeFacebookConnect() throws Xdi2ClientException, IOException, JSONException {
 		facebookService.revokeFacebookConnect();
+	}
+	
+	@ResponseBody
+	@RequestMapping(value = "/api/1.0/cloud/facebook/profile/", method = RequestMethod.GET)
+	public FacebookProfile getFacebookProfile() throws Xdi2ClientException, IOException {
+		return facebookService.getFacebookProfile();
 	}
 	
 	@RequestMapping(value = OAUTH_RETURN_URL, method = RequestMethod.GET)
