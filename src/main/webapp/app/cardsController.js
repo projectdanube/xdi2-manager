@@ -125,7 +125,7 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
 
                 $scope.availableFields = _.keys($scope.cardFieldLabels);
                 $scope.usedFields = [];
-                
+
                 $scope.card = data;
 
                 prepareFieldsForView();
@@ -135,7 +135,7 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
                     }
                 });
 
-                
+
                 $scope.currentTag = $scope.card.tag;
             }, function (error) {
                 $scope.error = "Error comunicating with the server, please try again.";
@@ -186,7 +186,9 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
         };
 
         $scope.showSection = function (section) {
-            if (_.isUndefined($scope.card)) return false;
+            if (_.isUndefined($scope.card)) {
+                return false;
+            }
 
             var fields = $scope.card.fields;
             if (section === 'personalDetails') {
@@ -219,23 +221,23 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
         var prepareFieldsForView = function () {
             _.forOwn($scope.card.fields, function (field, key) {
                 field.privacy = _.capitalize(field.privacy.toLowerCase());
-                
-                 if (field.linked !== null) {
+
+                if (field.linked !== null) {
                     field.value = null;
                 }
             });
         };
         var prepareFieldsForSubmit = function () {
             var card = angular.copy($scope.card);
-            
+
             _.forOwn(card.fields, function (field, key) {
                 field.privacy = field.privacy.toUpperCase();
-                
-                if (field.linked === 'FACEBOOK' && $scope.isFacebookField(key)) {
+
+                if (field.linked === 'FACEBOOK' && $scope.facebookProfile[key] !== null) {
                     field.value = $scope.facebookProfile[key].xdiAddress;
                 }
             });
-            
+
             return card;
         };
 
@@ -313,9 +315,20 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
             }
         };
 
-        $scope.isFacebookField = function (field) {
-            return _.indexOf(_.keys($scope.facebookProfile), field) >= 0 ? true : false;
-        }
+        $scope.isFacebookFieldAvailable = function (field) {
+            if (_.isUndefined($scope.facebookProfile)) {
+                return false;
+            }
+
+            return $scope.facebookProfile[field] !== null ? true : false;
+        };
+
+        $scope.changeLink = function (field, link) {
+            if (field.linked !== link) {
+                field.linked = link;
+                field.value = null;
+            }
+        };
 
   }]);
 

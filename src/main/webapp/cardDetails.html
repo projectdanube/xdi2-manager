@@ -110,11 +110,11 @@
                                     Link with {{card.fields['gender'].linked}} <span class="caret"></span>
                                 </button>
                                 <ul class="dropdown-menu" role="menu">
-                                    <li><a href ng-click="card.fields['gender'].linked = null">Not Linked</a>
+                                    <li><a href ng-click="changeLink(card.fields['gender'], null)">Not Linked</a>
                                     </li>
-                                    <li><a href ng-click="card.fields['gender'].linked = 'PROFILE'">Profile</a>
+                                    <li><a href ng-click="changeLink(card.fields['gender'], 'PROFILE')">Profile</a>
                                     </li>
-                                    <li ng-show="isFacebookField('gender')"><a href ng-click="card.fields['gender'].linked = 'FACEBOOK'">Facebook</a>
+                                    <li ng-show="isFacebookFieldAvailable('gender')"><a href ng-click="changeLink(card.fields['gender'], 'FACEBOOK')">Facebook</a>
                                     </li>
                                 </ul>
                             </div>&nbsp;
@@ -196,11 +196,11 @@
                     Link with {{$parent.card.fields[field].linked}} <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" role="menu">
-                    <li><a href ng-click="$parent.card.fields[field].linked = null">Not Linked</a>
+                    <li><a href ng-click="$parent.changeLink($parent.card.fields[field], null)">Not Linked</a>
                     </li>
-                    <li><a href ng-click="$parent.card.fields[field].linked = 'PROFILE'">Profile</a>
+                    <li><a href ng-click="$parent.changeLink($parent.card.fields[field], 'PROFILE')">Profile</a>
                     </li>
-                    <li ng-show="$parent.isFacebookField(field)"><a href ng-click="$parent.card.fields[field].linked = 'FACEBOOK'">Facebook</a>
+                    <li ng-show="$parent.isFacebookFieldAvailable(field)"><a href ng-click="$parent.changeLink($parent.card.fields[field], 'FACEBOOK')">Facebook</a>
                     </li>
                 </ul>
             </div>&nbsp;
@@ -219,7 +219,7 @@
             </button>
         </div>
         <input class="form-control input-sm col-xs-10" ng-model="$parent.card.fields[field].value" ng-show="$parent.card.fields[field].linked == null">
-        <input class="form-control input-sm col-xs-10" ng-model="$parent.card.fields[field].value" placeholder="{{$parent.getProfileField(field)}}" ng-show="$parent.card.fields[field].linked == 'PROFILE'" ng-change="$parent.card.fields[field].linked = null">
-        <input class="form-control input-sm col-xs-10" ng-model="$parent.card.fields[field].value" placeholder="{{$parent.facebookProfile[field].value}}" ng-show="$parent.card.fields[field].linked == 'FACEBOOK'" ng-change="$parent.card.fields[field].linked = null">
+        <input class="form-control input-sm col-xs-10" value="{{$parent.getProfileField(field)}}" ng-show="$parent.card.fields[field].linked == 'PROFILE'" ng-click="$parent.card.fields[field].linked = null">
+        <input class="form-control input-sm col-xs-10" value="{{$parent.facebookProfile[field].value}}" ng-show="$parent.card.fields[field].linked == 'FACEBOOK'" ng-click="$parent.card.fields[field].linked = null">
     </div>
 </script>

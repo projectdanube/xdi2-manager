@@ -491,8 +491,8 @@ controllers.controller("KeysCtrl", ['$scope', 'Key', '$anchorScroll', '$modal',
 
   }]);
 
-controllers.controller("FacebookCtrl", ['$scope', '$http', '$modal', '$sce',
-  function ($scope, $http, $modal, $sce) {
+controllers.controller("FacebookCtrl", ['$scope', '$http', '$sce',
+  function ($scope, $http, $sce) {
 
         var refresh = function () {
             $scope.inProgress = true;
