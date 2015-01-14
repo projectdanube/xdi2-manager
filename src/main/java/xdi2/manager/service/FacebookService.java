@@ -171,21 +171,16 @@ public class FacebookService {
 		MessageCollection messageCollection = messageEnvelope.getMessageCollection(user.getCloudNumber().getXDIAddress(), true);
 		Message message = messageCollection.createMessage();
 		message = user.prepareMessageToCloud(message);
-		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_FIRST_NAME));
-		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_LAST_NAME));
-		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_GENDER));
-		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_BIRTHDAY));
-		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_EMAIL));
-		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_WEBSITE));
+		
+		for (XDIAddress fieldXdiAddress : XDI_FACEBOOK_PROFILE.values()) {
+			message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, fieldXdiAddress));
+		}
 
 		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
 		
-		profile.setFirstName(generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_FIRST_NAME), messageResult.getGraph()));
-		profile.setLastName(generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_LAST_NAME), messageResult.getGraph()));
-		profile.setGender(generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_GENDER), messageResult.getGraph()));
-		profile.setBirthDate(generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_BIRTHDAY), messageResult.getGraph()));
-		profile.setEmail(generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_EMAIL), messageResult.getGraph()));
-		profile.setWebsite(generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_ADD_FACEBOOK_WEBSITE), messageResult.getGraph()));
+		for (String field : XDI_FACEBOOK_PROFILE.keySet()) {
+			profile.putField(field, generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_FACEBOOK_PROFILE.get(field)), messageResult.getGraph()));
+		}
 		
 		return profile;
 	}

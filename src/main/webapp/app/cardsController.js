@@ -109,7 +109,7 @@ controllers.controller("CardDetailsCtrl", ['$scope', 'Card', 'Profile', '$routeP
         // Load Facebook profile
         $http.get('api/1.0/cloud/facebook/profile/')
             .success(function (data) {
-                $scope.facebookProfile = data;
+                $scope.facebookProfile = data.fields;
             })
             .error(function (data) {
                 $scope.facebookProfile = {};

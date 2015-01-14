@@ -1,50 +1,27 @@
 package xdi2.manager.model;
 
-public class FacebookProfile {
+import java.util.HashMap;
+import java.util.Map;
 
-	private FacebookProfileField firstName;
-	private FacebookProfileField lastName;
-	private FacebookProfileField gender;
-	private FacebookProfileField birthDate;
-	private FacebookProfileField email;
-	private FacebookProfileField website;
+public class FacebookProfile {
 	
+	private Map<String, FacebookProfileField> fields;
 	
-	public FacebookProfileField getFirstName() {
-		return firstName;
+	public FacebookProfile() {
+		super();
+		this.fields = new HashMap<String, FacebookProfileField>();
 	}
-	public void setFirstName(FacebookProfileField firstName) {
-		this.firstName = firstName;
+
+	public Map<String, FacebookProfileField> getFields() {
+		return fields;
 	}
-	public FacebookProfileField getLastName() {
-		return lastName;
+
+	public void putField(String field, FacebookProfileField value) {
+		this.fields.put(field, value);
 	}
-	public void setLastName(FacebookProfileField lastName) {
-		this.lastName = lastName;
-	}
-	public FacebookProfileField getGender() {
-		return gender;
-	}
-	public void setGender(FacebookProfileField gender) {
-		this.gender = gender;
-	}
-	public FacebookProfileField getBirthDate() {
-		return birthDate;
-	}
-	public void setBirthDate(FacebookProfileField birthDate) {
-		this.birthDate = birthDate;
-	}
-	public FacebookProfileField getEmail() {
-		return email;
-	}
-	public void setEmail(FacebookProfileField email) {
-		this.email = email;
-	}
-	public FacebookProfileField getWebsite() {
-		return website;
-	}
-	public void setWebsite(FacebookProfileField website) {
-		this.website = website;
-	}
+	
+	public FacebookProfileField getField(String field) {
+		return this.fields.get(field);
+	}	
 	
 }
