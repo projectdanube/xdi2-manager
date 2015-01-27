@@ -7,7 +7,7 @@ This web application allows you to configure your personal cloud.
 
 * Personal Profile - Fill your personal information
 * Connection - Manage your cloud connections
-* Cloud Cards - Cloud Card editor (more information in [xdi2-cloudcards](https://github.com/projectdanube/xdi2-cloudcards))
+* Cloud Cards - Cloud Card editor (can be viewed by [Cloud Card Viewer](https://github.com/projectdanube/xdi2-cloudcards))
 * Facebook Connector - Link Facebook account to your personal cloud
 
 ### Information
