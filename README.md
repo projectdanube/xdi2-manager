@@ -23,7 +23,7 @@ After that, just run
 
     mvn clean install
 
-This will generate .war file ready for deployment.
+This will generate a .war file ready for deployment.
 
 ### Community
 
