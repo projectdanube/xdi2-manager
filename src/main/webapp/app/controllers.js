@@ -536,13 +536,14 @@ controllers.controller("FacebookCtrl", ['$scope', '$http', '$sce',
             var wait = function () {
                 if (_.isNull($scope.facebookConnector.userId) === false) {
                     clearInterval(waitInterval);
+                } else {
+                    refresh();
                 }
-                refresh();
             };
 
             var waitInterval = setInterval(wait, 3000);
         };
-      
+
         refresh();
 
   }]);
