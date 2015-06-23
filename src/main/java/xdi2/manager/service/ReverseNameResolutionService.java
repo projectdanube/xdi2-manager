@@ -86,9 +86,9 @@ public class ReverseNameResolutionService {
 		XDI2X509TrustManager.enable();
 		XDIDiscoveryClient xdiDiscoveryClient;
 		if (env == Environment.OTE) 
-			xdiDiscoveryClient = XDIDiscoveryClient.NEUSTAR_OTE_DISCOVERY_CLIENT;
+			xdiDiscoveryClient = XDIDiscoveryClient.XDI2_NEUSTAR_OTE_DISCOVERY_CLIENT;
 		else
-			xdiDiscoveryClient = XDIDiscoveryClient.NEUSTAR_PROD_DISCOVERY_CLIENT;
+			xdiDiscoveryClient = XDIDiscoveryClient.XDI2_NEUSTAR_PROD_DISCOVERY_CLIENT;
 
         XDIDiscoveryResult result = xdiDiscoveryClient.discoverFromRegistry(cloudNumber.getXDIAddress(), null);
         if (result == null)

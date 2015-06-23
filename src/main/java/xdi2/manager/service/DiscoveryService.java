@@ -50,9 +50,9 @@ public class DiscoveryService {
 	private XDIDiscoveryClient getXdiDiscoveryForEnv(Environment env) {
 		
 		if (env == Environment.OTE) 
-			return XDIDiscoveryClient.NEUSTAR_OTE_DISCOVERY_CLIENT;
+			return XDIDiscoveryClient.XDI2_NEUSTAR_OTE_DISCOVERY_CLIENT;
 		else
-			return XDIDiscoveryClient.NEUSTAR_PROD_DISCOVERY_CLIENT;
+			return XDIDiscoveryClient.XDI2_NEUSTAR_PROD_DISCOVERY_CLIENT;
 	}
 	
 }

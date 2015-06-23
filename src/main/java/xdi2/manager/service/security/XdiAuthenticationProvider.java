@@ -69,7 +69,7 @@ public class XdiAuthenticationProvider implements AuthenticationProvider {
 			discoveryClient = XDIDiscoveryClient.DEFAULT_DISCOVERY_CLIENT;
 		}
 		else {
-			discoveryClient = XDIDiscoveryClient.NEUSTAR_OTE_DISCOVERY_CLIENT;
+			discoveryClient = XDIDiscoveryClient.XDI2_NEUSTAR_OTE_DISCOVERY_CLIENT;
 		}
 		
 		XDIDiscoveryResult result = null;
