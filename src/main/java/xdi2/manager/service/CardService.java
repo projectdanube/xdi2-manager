@@ -15,7 +15,6 @@ import xdi2.core.Relation;
 import xdi2.core.syntax.XDIAddress;
 import xdi2.core.syntax.XDIStatement;
 import xdi2.core.util.XDIAddressUtil;
-import xdi2.core.util.iterators.ReadOnlyIterator;
 import xdi2.manager.model.Card;
 import xdi2.manager.model.CloudUser;
 import xdi2.manager.util.CardXdiModelConverter;
@@ -28,7 +27,7 @@ import xdi2.messaging.MessageResult;
 @Service
 public class CardService {
 	private static final Logger log = LoggerFactory.getLogger(CardService.class);
-	
+
 	@Autowired
 	private CardXdiModelConverter cardXdiModelConverter;
 
@@ -44,19 +43,19 @@ public class CardService {
 		message = user.prepareMessageToCloud(message);
 		GetOperation operation = message.createGetOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), CardXdiModelConverter.XDI_CARDS));
 		operation.setParameter(GetOperation.XDI_ADD_PARAMETER_DEREF, Boolean.TRUE);
-		
+
 		log.debug("getCard message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
-		
+
 		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
 
 		System.out.println(messageResult.getGraph().toString("XDI DISPLAY", null));
 
-		
+
 		List<Card> cards = cardXdiModelConverter.convertXdiToCards(messageResult.getGraph());
-		
+
 		// Get default card
 		XDIAddress defaultCardXdiAddress = getDefaultCardXdiAddress();
-		
+
 		if (defaultCardXdiAddress != null) {			
 			for (Card c : cards) {
 				if (c.getXdiAddress().equals(defaultCardXdiAddress.toString())) {
@@ -64,14 +63,14 @@ public class CardService {
 				}
 			}
 		}
-		
+
 		return cards;
 	}
-	
+
 	@Secured("IS_AUTHENTICATED")
 	public Card getCard(XDIAddress cardXdiAddress, boolean edit) throws Xdi2ClientException {
 		Assert.notNull(cardXdiAddress);
-		
+
 		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
@@ -90,11 +89,11 @@ public class CardService {
 		if (cards.size() > 1) {
 			throw new RuntimeException("Got " + cards.size() + " cards for the address " + cardXdiAddress);
 		}
-		
+
 		Card card = cards.size() == 1 ? cards.get(0) : null;
 		if (card != null) {
 			XDIAddress defaultCardXdiAddress = getDefaultCardXdiAddress();
-			
+
 			if (defaultCardXdiAddress != null && card.getXdiAddress().equals(defaultCardXdiAddress.toString()))
 				card.setDefault(true);
 		}
@@ -115,7 +114,7 @@ public class CardService {
 		message.createSetOperation(cardXdiModelConverter.convertCardToXdi(card).iterator());
 
 		log.debug("createCard message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
-		
+
 		user.getXdiClient().send(messageEnvelope, null);
 	}
 
@@ -133,26 +132,26 @@ public class CardService {
 
 		// Delete card
 		message.createDelOperation(XDIAddress.create(card.getXdiAddress()));
-		
+
 		// Delete card in Public LC
 		message.createDelOperation(cardXdiModelConverter.getCardInPublicLCStatement(XDIAddress.create(card.getXdiAddress()), card).iterator());
-		
+
 		// Delete card shortcut
 		message.createDelOperation(cardXdiModelConverter.getCardShortcutAddress(card));
 
 		log.debug("deleteCard message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
-		
+
 		user.getXdiClient().send(messageEnvelope, null);
 	}
-	
+
 	@Secured("IS_AUTHENTICATED")
 	public void editCard(Card card) throws Xdi2ClientException {
 		Assert.notNull(card);
-		
+
 		deleteCard(XDIAddress.create(card.getXdiAddress()));
 		createCard(card);
 	}
-	
+
 	@Secured("IS_AUTHENTICATED")
 	public void setDefaultCard(XDIAddress cardXdiAddress) throws Xdi2ClientException {
 		Assert.notNull(cardXdiAddress);
@@ -172,14 +171,14 @@ public class CardService {
 		// create a new $ref
 		message = messageCollection.createMessage(messageIndex);
 		message = user.prepareMessageToCloud(message);
-		
+
 		message.createSetOperation(XDIStatement.create(user.getCloudNumber() + "$card/$ref/" + cardXdiAddress));
 
 		log.debug("setDefaultCard message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
 
 		user.getXdiClient().send(messageEnvelope, null);
 	}
-	
+
 	private XDIAddress getDefaultCardXdiAddress() throws Xdi2ClientException {
 		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -187,23 +186,19 @@ public class CardService {
 		MessageCollection messageCollection = messageEnvelope.getMessageCollection(user.getCloudNumber().getXDIAddress(), true);
 		Message message = messageCollection.createMessage();
 		message = user.prepareMessageToCloud(message);
-		
-		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), CardXdiModelConverter.XDI_CARD_DEFAULT));
-		
-		log.debug("getDefaultCardXdiAddress message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
-		
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
-		
-		System.out.println(messageResult.getGraph().toString("XDI DISPLAY", null));
-		
-		ReadOnlyIterator<Relation> relations = messageResult.getGraph().getDeepRelations(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), CardXdiModelConverter.XDI_CARD_DEFAULT), XDIAddress.create("$ref"));
 
-		while (relations.hasNext()) {
-			Relation r = relations.next();
-			return r.getTargetContextNodeXDIAddress();
-		}
-		
-		return null;
+		message.createGetOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), CardXdiModelConverter.XDI_CARD_DEFAULT));
+
+		log.debug("getDefaultCardXdiAddress message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
+
+		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+
+		System.out.println(messageResult.getGraph().toString("XDI DISPLAY", null));
+
+		Relation relation = messageResult.getGraph().getDeepRelation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), CardXdiModelConverter.XDI_CARD_DEFAULT), XDIAddress.create("$ref"));
+		if (relation == null) return null;
+
+		return relation.getTargetXDIAddress();
 	}
 
 	@Secured("IS_AUTHENTICATED")
@@ -211,7 +206,7 @@ public class CardService {
 		Assert.hasLength(cardShortcut);
 
 		cardShortcut += "$card";
-		
+
 		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
@@ -220,19 +215,14 @@ public class CardService {
 		message = user.prepareMessageToCloud(message);
 
 		message.createGetOperation(XDIAddress.create(cardShortcut));
-		
-		log.debug("getCardAddressByShortcut message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
-		
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
-		
-		ReadOnlyIterator<Relation> relations = messageResult.getGraph().getDeepRelations(XDIAddress.create(cardShortcut), XDIAddress.create("$ref"));
 
-		while (relations.hasNext()) {
-			Relation r = relations.next();
-			return r.getTargetContextNodeXDIAddress();
-		}
-		
-		return null;
+		log.debug("getCardAddressByShortcut message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
+
+		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+
+		Relation relation = messageResult.getGraph().getDeepRelation(XDIAddress.create(cardShortcut), XDIAddress.create("$ref"));
+		if (relation == null) return null;
+
+		return relation.getTargetXDIAddress();
 	}
-	
 }

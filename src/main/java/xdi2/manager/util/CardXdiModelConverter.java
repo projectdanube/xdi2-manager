@@ -18,12 +18,13 @@ import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.connector.facebook.mapping.FacebookMapping;
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
-import xdi2.core.Literal;
+import xdi2.core.LiteralNode;
 import xdi2.core.Relation;
 import xdi2.core.features.nodetypes.XdiEntityCollection;
-import xdi2.core.features.nodetypes.XdiEntityMember;
-import xdi2.core.features.nodetypes.XdiEntityMemberUnordered;
+import xdi2.core.features.nodetypes.XdiEntityInstance;
+import xdi2.core.features.nodetypes.XdiEntityInstanceUnordered;
 import xdi2.core.syntax.XDIAddress;
+import xdi2.core.syntax.XDIArc;
 import xdi2.core.syntax.XDIStatement;
 import xdi2.core.util.XDIAddressUtil;
 import xdi2.core.util.XDIStatementUtil;
@@ -75,10 +76,10 @@ public class CardXdiModelConverter {
 			return cards;
 		}
 		long start = System.currentTimeMillis();
-		ReadOnlyIterator<XdiEntityMember> iCards = cardCollection.getXdiMembers();
+		ReadOnlyIterator<XdiEntityInstance> iCards = cardCollection.getXdiInstances();
 
 		while (iCards.hasNext()) {
-			XdiEntityMember cardXdi = iCards.next();
+			XdiEntityInstance cardXdi = iCards.next();
 
 			cards.add(convertXdiToCard(cardXdi));
 		}
@@ -86,7 +87,7 @@ public class CardXdiModelConverter {
 		return cards;
 	}
 
-	public Card convertXdiToCard(XdiEntityMember cardXdi) {
+	public Card convertXdiToCard(XdiEntityInstance cardXdi) {
 		Assert.notNull(cardXdi);
 
 		Card card = new Card();
@@ -94,19 +95,19 @@ public class CardXdiModelConverter {
 		// get general card info
 		card.setXdiAddress(cardXdi.getXDIAddress().toString());
 
-		Literal l = cardXdi.getGraph().getRootContextNode().getDeepLiteral(XDIAddressUtil.concatXDIAddresses(cardXdi.getXDIAddress(), XDI_CARD_DESCRIPTION));
+		LiteralNode l = cardXdi.getGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(cardXdi.getXDIAddress(), XDI_CARD_DESCRIPTION));
 		if (l != null) {
 			card.setDescription(l.getLiteralDataString());
 		}
-		l = cardXdi.getGraph().getRootContextNode().getDeepLiteral(XDIAddressUtil.concatXDIAddresses(cardXdi.getXDIAddress(), XDI_CARD_TAG));
+		l = cardXdi.getGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(cardXdi.getXDIAddress(), XDI_CARD_TAG));
 		if (l != null) {
 			card.setTag(l.getLiteralDataString());
 		}
-		l = cardXdi.getGraph().getRootContextNode().getDeepLiteral(XDIAddressUtil.concatXDIAddresses(cardXdi.getXDIAddress(), XDI_CARD_CONNECT_BUTTON));
+		l = cardXdi.getGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(cardXdi.getXDIAddress(), XDI_CARD_CONNECT_BUTTON));
 		if (l != null) {
 			card.setMessageConnectButton(l.getLiteralDataString());
 		}
-		l = cardXdi.getGraph().getRootContextNode().getDeepLiteral(XDIAddressUtil.concatXDIAddresses(cardXdi.getXDIAddress(), XDI_CARD_BACKGROUND_IMAGE));
+		l = cardXdi.getGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(cardXdi.getXDIAddress(), XDI_CARD_BACKGROUND_IMAGE));
 		if (l != null) {
 			card.setBackgroundImage(l.getLiteralDataString());
 		}
@@ -119,7 +120,7 @@ public class CardXdiModelConverter {
 		return card;
 	}
 
-	private CardField convertXdiToCardField (XdiEntityMember cardXdi, XDIAddress fieldXdi) {
+	private CardField convertXdiToCardField (XdiEntityInstance cardXdi, XDIAddress fieldXdi) {
 		Assert.notNull(cardXdi);
 		Assert.notNull(fieldXdi);
 
@@ -138,7 +139,7 @@ public class CardXdiModelConverter {
 			}
 		}
 
-		Literal l = fieldContextNode.getLiteral();
+		LiteralNode l = fieldContextNode.getLiteralNode();
 		if (l != null) {
 			field.setValue(l.getLiteralDataString());
 			field.setXdiStatement(l.getStatement().toString());
@@ -170,7 +171,7 @@ public class CardXdiModelConverter {
 		}
 		else {
 			XDIAddress cardsCollectionXdiAddress = XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDI_CARDS);
-			cardXdiAddress = XDIAddressUtil.concatXDIAddresses(cardsCollectionXdiAddress, XdiEntityMemberUnordered.createRandomUuidXDIArc(XdiEntityCollection.class));
+			cardXdiAddress = XDIAddressUtil.concatXDIAddresses(cardsCollectionXdiAddress, XdiEntityInstanceUnordered.createXDIArc(false, false, XDIArc.literalFromRandomUuid(), null));
 		}
 
 		List<XDIStatement> statements = new ArrayList<XDIStatement>();

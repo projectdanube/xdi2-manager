@@ -21,7 +21,6 @@ import xdi2.core.syntax.CloudNumber;
 import xdi2.core.syntax.XDIAddress;
 import xdi2.core.syntax.XDIStatement;
 import xdi2.core.util.XDIStatementUtil;
-import xdi2.core.util.iterators.ReadOnlyIterator;
 import xdi2.discovery.XDIDiscoveryClient;
 import xdi2.discovery.XDIDiscoveryResult;
 import xdi2.manager.model.Environment;
@@ -109,14 +108,9 @@ public class ReverseNameResolutionService {
 		MessageResult mr = client.send(me, null);
 		
 		// read the response
-		ReadOnlyIterator<Relation> relations = mr.getGraph().getDeepRelations(cloudNumber.getXDIAddress(), XDIAddress.create("$is$ref"));
-
-		while (relations.hasNext()) {
-			Relation r = relations.next();
-			return r.getTargetContextNodeXDIAddress().toString();
-		}
+		Relation relation = mr.getGraph().getDeepRelation(cloudNumber.getXDIAddress(), XDIAddress.create("$is$ref"));
+		if (relation == null) return null;
 		
-		return null;
+		return relation.getTargetXDIAddress().toString();
 	}
-
 }

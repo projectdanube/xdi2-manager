@@ -21,9 +21,8 @@ import xdi2.connector.facebook.api.FacebookApi;
 import xdi2.connector.facebook.mapping.FacebookMapping;
 import xdi2.connector.facebook.util.GraphUtil;
 import xdi2.core.Graph;
-import xdi2.core.Literal;
+import xdi2.core.LiteralNode;
 import xdi2.core.constants.XDIAuthenticationConstants;
-import xdi2.core.constants.XDIConstants;
 import xdi2.core.syntax.XDIAddress;
 import xdi2.core.syntax.XDIStatement;
 import xdi2.core.util.XDIAddressUtil;
@@ -114,7 +113,7 @@ public class FacebookService {
 		XDIStatement facebookUserIdStatement = XDIStatement.create(FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + user.getCloudNumber().toString() + "/$ref/" + FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + facebookUserIdXri);
 		
 		// Facebook OAuth Token ex: (https://facebook.com/)[=]!10205481317089832<$oauth><$token>&/&/"dfasdhfgasdfaghsdf"
-		XDIStatement facebookAccessTokenStatement = XDIStatement.create("" + FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + facebookUserIdXri + XDIAuthenticationConstants.XDI_ADD_OAUTH_TOKEN + XDIConstants.XDI_ADD_VALUE + "/&/\"" + facebookAccessToken + "\"");
+		XDIStatement facebookAccessTokenStatement = XDIStatement.create("" + FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + facebookUserIdXri + XDIAuthenticationConstants.XDI_ADD_OAUTH_TOKEN + "/&/\"" + facebookAccessToken + "\"");
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 		MessageCollection messageCollection = messageEnvelope.getMessageCollection(user.getCloudNumber().getXDIAddress(), true);
@@ -134,7 +133,7 @@ public class FacebookService {
 		if (facebookConnect.getAccessToken() != null) {
 			facebookApi.revokeAccessToken(facebookConnect.getAccessToken());
 			
-			XDIAddress facebookAccessTokenXdiAddress = XDIAddress.create("" + FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + facebookConnect.getUserId() + XDIAuthenticationConstants.XDI_ADD_OAUTH_TOKEN + XDIConstants.XDI_ADD_VALUE);
+			XDIAddress facebookAccessTokenXdiAddress = XDIAddress.create("" + FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + facebookConnect.getUserId() + XDIAuthenticationConstants.XDI_ADD_OAUTH_TOKEN);
 			XDIAddress facebookUserIdXdiAddress = XDIAddress.create("" + FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT + user.getCloudNumber());
 
 			MessageEnvelope messageEnvelope = new MessageEnvelope();
@@ -187,7 +186,7 @@ public class FacebookService {
 	
 	private FacebookProfileField generateFacebookField(XDIAddress fieldXdiAddress, Graph graph) {
 		
-		Literal l = graph.getRootContextNode().getDeepLiteral(fieldXdiAddress);
+		LiteralNode l = graph.getRootContextNode().getDeepLiteralNode(fieldXdiAddress);
 		if (l != null) {
 			return new FacebookProfileField(l.getLiteralDataString(), fieldXdiAddress.toString());
 		}

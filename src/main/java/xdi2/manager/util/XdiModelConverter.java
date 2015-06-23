@@ -18,7 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
 import xdi2.core.Graph;
-import xdi2.core.Literal;
+import xdi2.core.LiteralNode;
 import xdi2.core.constants.XDILinkContractConstants;
 import xdi2.core.features.linkcontracts.LinkContractBase;
 import xdi2.core.features.linkcontracts.instance.GenericLinkContract;
@@ -179,7 +179,7 @@ public class XdiModelConverter {
 
 	private static String getStringLiteralForSegment(Graph graph, CloudNumber cloudNumber, XDIAddress segment) {
 
-		Literal l = graph.getRootContextNode().getDeepLiteral(XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), segment));
+		LiteralNode l = graph.getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), segment));
 		return l != null ? l.getLiteralDataString() : null;
 	}
 
@@ -268,7 +268,7 @@ public class XdiModelConverter {
 		tag = StringUtils.remove(tag, linkContractTemplate.getXdiVariable().getBaseXDIArc().toString());
 		connectionTemplate.setTag(tag);
 
-		Literal l = linkContractTemplate.getContextNode().getDeepLiteral(XDIAddress.create(connectionTemplate.getXdiAddress() + "<#description>&"));
+		LiteralNode l = linkContractTemplate.getContextNode().getDeepLiteralNode(XDIAddress.create(connectionTemplate.getXdiAddress() + "<#description>&"));
 		connectionTemplate.setDescription(l != null ? l.getLiteralDataString() : null);
 
 		return connectionTemplate;

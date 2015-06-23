@@ -14,7 +14,7 @@ import org.springframework.util.Assert;
 
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.core.ContextNode;
-import xdi2.core.Literal;
+import xdi2.core.LiteralNode;
 import xdi2.core.Relation;
 import xdi2.core.constants.XDIAuthenticationConstants;
 import xdi2.core.constants.XDIConstants;
@@ -119,7 +119,7 @@ public class CloudService {
 		List<String> cloudNames = new ArrayList<String>();
 		while (relations.hasNext()) {
 			Relation r = relations.next();
-			cloudNames.add(r.getTargetContextNodeXDIAddress().toString());
+			cloudNames.add(r.getTargetXDIAddress().toString());
 		}
 
 		return cloudNames;
@@ -161,7 +161,7 @@ public class CloudService {
 		while (relations.hasNext()) {
 			Relation r = relations.next();
 			
-			String dependentCloudNumber = r.getTargetContextNodeXDIAddress().toString();
+			String dependentCloudNumber = r.getTargetXDIAddress().toString();
 			dependents.add(reverseNameResolutionService.getCloudName(user.getEnvironment(), dependentCloudNumber));
 		}
 
@@ -187,7 +187,7 @@ public class CloudService {
 		while (relations.hasNext()) {
 			Relation r = relations.next();
 			
-			String dependentCloudNumber = r.getTargetContextNodeXDIAddress().toString();
+			String dependentCloudNumber = r.getTargetXDIAddress().toString();
 			
 			// there is a link contract with this relation
 			if (dependentCloudNumber.startsWith("[=]"))
@@ -407,10 +407,10 @@ public class CloudService {
 
 		String[] keyPair = new String[2];
 
-		Literal l = messageResult.getGraph().getRootContextNode().getDeepLiteral(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAddress.create(subsegment + "<$public><$key>&")));
+		LiteralNode l = messageResult.getGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAddress.create(subsegment + "<$public><$key>&")));
 		keyPair[0] = l != null ? l.getLiteralDataString() : null;		
 
-		l = messageResult.getGraph().getRootContextNode().getDeepLiteral(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAddress.create(subsegment + "<$private><$key>&")));
+		l = messageResult.getGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAddress.create(subsegment + "<$private><$key>&")));
 		keyPair[1] = l != null ? l.getLiteralDataString() : null;
 
 		return keyPair;
