@@ -1,8 +1,5 @@
-.classpath
-.settings
-.project
-target/
-src/main/webapp/libs/
 .externalToolBuilders
 .DS_Store
 /bin/
+/target
+/log4j.log
