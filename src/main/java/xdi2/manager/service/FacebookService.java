@@ -34,7 +34,7 @@ import xdi2.manager.model.FacebookProfileField;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageCollection;
 import xdi2.messaging.MessageEnvelope;
-import xdi2.messaging.MessageResult;
+import xdi2.messaging.response.MessagingResponse;
 
 @Service
 public class FacebookService {
@@ -70,10 +70,10 @@ public class FacebookService {
 
 		FacebookConnect facebookConnect = new FacebookConnect();
 
-		// Generate the OAuth URL
-		String oAuthUrl = facebookApi.startOAuth(null, generateOAuthReturnUrl(), user.getCloudNumber().getXDIAddress());
-		log.debug("Facebook OAuth URL " + oAuthUrl);
-		facebookConnect.setoAuthUrl(oAuthUrl);
+		// Generate the OAuth URI
+		String oAuthUri = facebookApi.startOAuth(null, generateOAuthReturnUri(), user.getCloudNumber().getXDIAddress());
+		log.debug("Facebook OAuth URI " + oAuthUri);
+		facebookConnect.setoAuthUri(oAuthUri);
 
 		// Get User Id and Access Token
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
@@ -81,12 +81,12 @@ public class FacebookService {
 		Message message = messageCollection.createMessage();
 		message = user.prepareMessageToCloud(message);
 		message.createGetOperation(FacebookMapping.XDI_ADD_FACEBOOK_CONTEXT);
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		XDIAddress facebookUserIdXri = GraphUtil.retrieveFacebookUserIdXri(messageResult.getGraph(), user.getCloudNumber().getXDIAddress());
+		XDIAddress facebookUserIdXri = GraphUtil.retrieveFacebookUserIdXri(messagingResponse.getResultGraph(), user.getCloudNumber().getXDIAddress());
 		if (facebookUserIdXri != null) {
 
-			String facebookAccessToken = GraphUtil.retrieveFacebookAccessToken(messageResult.getGraph(), facebookUserIdXri);
+			String facebookAccessToken = GraphUtil.retrieveFacebookAccessToken(messagingResponse.getResultGraph(), facebookUserIdXri);
 
 			facebookConnect.setUserId(facebookUserIdXri.toString());
 			facebookConnect.setAccessToken(facebookAccessToken);
@@ -103,7 +103,7 @@ public class FacebookService {
 
 		facebookApi.checkState(state, user.getCloudNumber().getXDIAddress());
 
-		String facebookAccessToken = facebookApi.exchangeCodeForAccessToken(generateOAuthReturnUrl(), code);
+		String facebookAccessToken = facebookApi.exchangeCodeForAccessToken(generateOAuthReturnUri(), code);
 		if (facebookAccessToken == null) throw new Exception("No access token received.");
 
 		String facebookUserId = facebookApi.retrieveUserId(facebookAccessToken);
@@ -122,7 +122,7 @@ public class FacebookService {
 		message.createSetOperation(facebookUserIdStatement);
 		message.createSetOperation(facebookAccessTokenStatement);
 
-		user.getXdiClient().send(messageEnvelope, null);
+		user.getXdiClient().send(messageEnvelope);
 
 	}
 
@@ -143,19 +143,19 @@ public class FacebookService {
 			message.createDelOperation(facebookAccessTokenXdiAddress);
 			message.createDelOperation(facebookUserIdXdiAddress);
 
-			user.getXdiClient().send(messageEnvelope, null);
+			user.getXdiClient().send(messageEnvelope);
 			
 		}
 	}
 
-	private String generateOAuthReturnUrl() {
+	private String generateOAuthReturnUri() {
 		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
 		
-		String returnUrl = request.getRequestURL().toString().replace(request.getRequestURI(), "") + request.getContextPath();
-		returnUrl += FacebookController.OAUTH_RETURN_URL;
-		log.debug("Facebook OAuth return url: " + returnUrl);
+		String returnUri = request.getRequestURI().toString().replace(request.getRequestURI(), "") + request.getContextPath();
+		returnUri += FacebookController.OAUTH_RETURN_URI;
+		log.debug("Facebook OAuth return url: " + returnUri);
 		
-		return returnUrl;
+		return returnUri;
 	}
 	
 	public FacebookProfile getFacebookProfile() throws Xdi2ClientException, IOException {
@@ -175,10 +175,10 @@ public class FacebookService {
 			message.createGetOperation(XDIAddressUtil.concatXDIAddresses(facebookContext, fieldXdiAddress));
 		}
 
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 		
 		for (String field : XDI_FACEBOOK_PROFILE.keySet()) {
-			profile.putField(field, generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_FACEBOOK_PROFILE.get(field)), messageResult.getGraph()));
+			profile.putField(field, generateFacebookField(XDIAddressUtil.concatXDIAddresses(facebookContext, XDI_FACEBOOK_PROFILE.get(field)), messagingResponse.getResultGraph()));
 		}
 		
 		return profile;

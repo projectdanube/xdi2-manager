@@ -22,7 +22,7 @@ public class GenericController extends AbstractController {
 	public SessionProperties getSessionDetails() throws Xdi2ClientException {
 		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		SessionProperties sessionProperties = new SessionProperties(user);
-		sessionProperties.setCloudCardAppUrl(configuration.getCloudCardAppUrl());
+		sessionProperties.setCloudCardAppUri(configuration.getCloudCardAppUri());
 		return sessionProperties;
 	}
 	

@@ -143,7 +143,7 @@
 
 		<dependency>
 			<groupId>xdi2</groupId>
-			<artifactId>xdi2-client</artifactId>
+			<artifactId>xdi2-messaging-target</artifactId>
 			<version>0.8-SNAPSHOT</version>
 			<scope>compile</scope>
 			<exclusions>

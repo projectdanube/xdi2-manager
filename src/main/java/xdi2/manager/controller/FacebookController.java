@@ -24,7 +24,7 @@ public class FacebookController extends AbstractController {
 	private static final Logger log = LoggerFactory.getLogger(FacebookController.class);
 
 
-	public final static String OAUTH_RETURN_URL = "/cloud/facebook/";
+	public final static String OAUTH_RETURN_URI = "/cloud/facebook/";
 	
 	@Autowired
 	FacebookService facebookService;
@@ -47,7 +47,7 @@ public class FacebookController extends AbstractController {
 		return facebookService.getFacebookProfile();
 	}
 	
-	@RequestMapping(value = OAUTH_RETURN_URL, method = RequestMethod.GET)
+	@RequestMapping(value = OAUTH_RETURN_URI, method = RequestMethod.GET)
 	public String handleFacebookOAuthResponse(
 			@RequestParam(required=false) String code,
 			@RequestParam(required=false) String state,

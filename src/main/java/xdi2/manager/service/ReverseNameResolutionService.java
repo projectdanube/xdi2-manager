@@ -1,7 +1,6 @@
 package xdi2.manager.service;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.net.URI;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -13,8 +12,8 @@ import org.springframework.util.Assert;
 import xdi2.client.XDIClient;
 import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.client.exceptions.Xdi2DiscoveryException;
-import xdi2.client.http.XDIHttpClient;
-import xdi2.client.http.ssl.XDI2X509TrustManager;
+import xdi2.client.impl.http.XDIHttpClient;
+import xdi2.client.impl.http.ssl.XDI2X509TrustManager;
 import xdi2.core.Relation;
 import xdi2.core.features.linkcontracts.instance.PublicLinkContract;
 import xdi2.core.syntax.CloudNumber;
@@ -26,7 +25,7 @@ import xdi2.discovery.XDIDiscoveryResult;
 import xdi2.manager.model.Environment;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageEnvelope;
-import xdi2.messaging.MessageResult;
+import xdi2.messaging.response.MessagingResponse;
 
 @Service
 public class ReverseNameResolutionService {
@@ -78,7 +77,7 @@ public class ReverseNameResolutionService {
 
 
 
-	private String getCloudNameFromPublicLC(Environment env, String cloudNumberStr) throws Xdi2DiscoveryException, Xdi2ClientException, MalformedURLException {
+	private String getCloudNameFromPublicLC(Environment env, String cloudNumberStr) throws Xdi2DiscoveryException, Xdi2ClientException {
 
 		CloudNumber cloudNumber = CloudNumber.create(cloudNumberStr);
 		
@@ -90,11 +89,11 @@ public class ReverseNameResolutionService {
 		else
 			xdiDiscoveryClient = XDIDiscoveryClient.XDI2_NEUSTAR_PROD_DISCOVERY_CLIENT;
 
-        XDIDiscoveryResult result = xdiDiscoveryClient.discoverFromRegistry(cloudNumber.getXDIAddress(), null);
+        XDIDiscoveryResult result = xdiDiscoveryClient.discoverFromRegistry(cloudNumber.getXDIAddress());
         if (result == null)
         	return null;
         
-        URL xdiEndpoint = result.getXdiEndpointUrl();
+        URI xdiEndpoint = result.getXdiEndpointUri();
         
         // Query cloud for cloud names
 		XDIClient client = new XDIHttpClient(xdiEndpoint);
@@ -105,10 +104,10 @@ public class ReverseNameResolutionService {
 
 		m.createGetOperation(XDIStatementUtil.concatXDIStatement(cloudNumber.getXDIAddress(), XDI_CLOUD_NAMES));
 
-		MessageResult mr = client.send(me, null);
+		MessagingResponse mr = client.send(me);
 		
 		// read the response
-		Relation relation = mr.getGraph().getDeepRelation(cloudNumber.getXDIAddress(), XDIAddress.create("$is$ref"));
+		Relation relation = mr.getResultGraph().getDeepRelation(cloudNumber.getXDIAddress(), XDIAddress.create("$is$ref"));
 		if (relation == null) return null;
 		
 		return relation.getTargetXDIAddress().toString();

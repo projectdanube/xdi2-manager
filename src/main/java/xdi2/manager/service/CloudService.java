@@ -36,7 +36,7 @@ import xdi2.manager.util.XdiModelConverter;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageCollection;
 import xdi2.messaging.MessageEnvelope;
-import xdi2.messaging.MessageResult;
+import xdi2.messaging.response.MessagingResponse;
 import xdi2.messaging.target.contributor.impl.keygen.GenerateKeyContributor;
 
 @Service
@@ -60,10 +60,10 @@ public class CloudService {
 		xdiModelConverter.prepareMessageForPersonalProfile(message);
 
 		long start = System.currentTimeMillis();
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 		log.debug("network time: " + (System.currentTimeMillis() - start));		
 
-		PersonalProfile profile = xdiModelConverter.convertToPersonalProfile(messageResult.getGraph());
+		PersonalProfile profile = xdiModelConverter.convertToPersonalProfile(messagingResponse.getResultGraph());
 
 		return profile;
 	}
@@ -82,7 +82,7 @@ public class CloudService {
 		List<XDIStatement> statements = xdiModelConverter.convertPersonalProfileToStatements(profile);
 		message.createSetOperation(statements.iterator());
 
-		user.getXdiClient().send(messageEnvelope, null);
+		user.getXdiClient().send(messageEnvelope);
 
 	}
 
@@ -96,9 +96,9 @@ public class CloudService {
 		message = user.prepareMessageToCloud(message);
 		message.createGetOperation(XDIConstants.XDI_ADD_ROOT);
 
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		return messageResult.getGraph().getRootContextNode().getAllStatementCount();
+		return messagingResponse.getResultGraph().getRootContextNode().getAllStatementCount();
 	}
 
 	@Secured("IS_AUTHENTICATED")
@@ -112,9 +112,9 @@ public class CloudService {
 		
 		message.createGetOperation(XDIStatement.create(user.getCloudNumber() + "/$is$ref/{}"));
 		
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		ReadOnlyIterator<Relation> relations = messageResult.getGraph().getDeepRelations(user.getCloudNumber().getXDIAddress(), XDIAddress.create("$is$ref"));
+		ReadOnlyIterator<Relation> relations = messagingResponse.getResultGraph().getDeepRelations(user.getCloudNumber().getXDIAddress(), XDIAddress.create("$is$ref"));
 
 		List<String> cloudNames = new ArrayList<String>();
 		while (relations.hasNext()) {
@@ -136,9 +136,9 @@ public class CloudService {
 		
 		message.createGetOperation(XDIStatement.create(user.getCloudNumber() + "/$is$ref/{}"));
 		
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		ContextNode contextNode = messageResult.getGraph().getDeepContextNode(user.getCloudNumber().getXDIAddress());
+		ContextNode contextNode = messagingResponse.getResultGraph().getDeepContextNode(user.getCloudNumber().getXDIAddress());
 		return contextNode.toString();
 	}
 	
@@ -153,9 +153,9 @@ public class CloudService {
 		
 		message.createGetOperation(XDIStatement.create(user.getCloudNumber() + "/$is#guardian/{}"));
 		
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		ReadOnlyIterator<Relation> relations = messageResult.getGraph().getDeepRelations(user.getCloudNumber().getXDIAddress(), XDIAddress.create("$is#guardian"));
+		ReadOnlyIterator<Relation> relations = messagingResponse.getResultGraph().getDeepRelations(user.getCloudNumber().getXDIAddress(), XDIAddress.create("$is#guardian"));
 
 		List<String> dependents = new ArrayList<String>();
 		while (relations.hasNext()) {
@@ -179,9 +179,9 @@ public class CloudService {
 		
 		message.createGetOperation(XDIStatement.create(user.getCloudNumber() + "/#guardian/{}"));
 		
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		ReadOnlyIterator<Relation> relations = messageResult.getGraph().getDeepRelations(user.getCloudNumber().getXDIAddress(), XDIAddress.create("#guardian"));
+		ReadOnlyIterator<Relation> relations = messagingResponse.getResultGraph().getDeepRelations(user.getCloudNumber().getXDIAddress(), XDIAddress.create("#guardian"));
 
 		List<String> guardians = new ArrayList<String>();
 		while (relations.hasNext()) {
@@ -212,7 +212,7 @@ public class CloudService {
 
 		message.createSetOperation(l.getContextNode().getGraph());
 
-		user.getXdiClient().send(messageEnvelope, null);
+		user.getXdiClient().send(messageEnvelope);
 
 	}
 
@@ -226,9 +226,9 @@ public class CloudService {
 		message = user.prepareMessageToCloud(message);
 		message.createGetOperation(user.getCloudNumber().getXDIAddress());
 
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		Iterator<LinkContract> linkContracts = LinkContracts.getAllLinkContracts(messageResult.getGraph());
+		Iterator<LinkContract> linkContracts = LinkContracts.getAllLinkContracts(messagingResponse.getResultGraph());
 
 		List<Connection> connections = new ArrayList<>();
 		while (linkContracts.hasNext()) {
@@ -253,9 +253,9 @@ public class CloudService {
 		String xdiAddress = Connection.convertIdToXdiAddress(id);
 		message.createGetOperation(XDIAddress.create(xdiAddress));
 
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		Iterator<LinkContract> linkContracts = LinkContracts.getAllLinkContracts(messageResult.getGraph());		
+		Iterator<LinkContract> linkContracts = LinkContracts.getAllLinkContracts(messagingResponse.getResultGraph());		
 		if (linkContracts.hasNext() == false) {
 			return null;
 		}
@@ -277,7 +277,7 @@ public class CloudService {
 		String xdiAddress = Connection.convertIdToXdiAddress(id);
 		message.createDelOperation(XDIAddress.create(xdiAddress));
 
-		user.getXdiClient().send(messageEnvelope, null);
+		user.getXdiClient().send(messageEnvelope);
 
 	}
 
@@ -303,7 +303,7 @@ public class CloudService {
 
 		message.createSetOperation(l.getContextNode().getGraph());
 
-		user.getXdiClient().send(messageEnvelope, null);
+		user.getXdiClient().send(messageEnvelope);
 
 	}
 
@@ -317,9 +317,9 @@ public class CloudService {
 		message = user.prepareMessageToCloud(message);
 		message.createGetOperation(user.getCloudNumber().getXDIAddress());
 
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		Iterator<LinkContractTemplate> linkContracts = LinkContractTemplates.getAllLinkContractTemplates(messageResult.getGraph());
+		Iterator<LinkContractTemplate> linkContracts = LinkContractTemplates.getAllLinkContractTemplates(messagingResponse.getResultGraph());
 
 		List<ConnectionTemplate> connections = new ArrayList<>();
 		while (linkContracts.hasNext()) {
@@ -344,9 +344,9 @@ public class CloudService {
 		String xdiAddress = Connection.convertIdToXdiAddress(id);
 		message.createGetOperation(XDIAddress.create(xdiAddress));
 
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		Iterator<LinkContractTemplate> linkContractTemplate = LinkContractTemplates.getAllLinkContractTemplates(messageResult.getGraph());		
+		Iterator<LinkContractTemplate> linkContractTemplate = LinkContractTemplates.getAllLinkContractTemplates(messagingResponse.getResultGraph());		
 		if (linkContractTemplate.hasNext() == false) {
 			return null;
 		}
@@ -368,7 +368,7 @@ public class CloudService {
 		String xdiAddress = Connection.convertIdToXdiAddress(id);
 		message.createDelOperation(XDIAddress.create(xdiAddress));
 
-		user.getXdiClient().send(messageEnvelope, null);
+		user.getXdiClient().send(messageEnvelope);
 
 	}
 
@@ -403,14 +403,14 @@ public class CloudService {
 			subsegment = "$msg$sig$keypair";
 		}
 
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
 		String[] keyPair = new String[2];
 
-		LiteralNode l = messageResult.getGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAddress.create(subsegment + "<$public><$key>&")));
+		LiteralNode l = messagingResponse.getResultGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAddress.create(subsegment + "<$public><$key>&")));
 		keyPair[0] = l != null ? l.getLiteralDataString() : null;		
 
-		l = messageResult.getGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAddress.create(subsegment + "<$private><$key>&")));
+		l = messagingResponse.getResultGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAddress.create(subsegment + "<$private><$key>&")));
 		keyPair[1] = l != null ? l.getLiteralDataString() : null;
 
 		return keyPair;
@@ -431,7 +431,7 @@ public class CloudService {
 			message.createOperation(GenerateKeyContributor.XDI_ADD_DO_KEYPAIR, XDIStatement.fromComponents(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAuthenticationConstants.XDI_ADD_MSG_SIG_KEYPAIR), XDIDictionaryConstants.XDI_ADD_IS_TYPE, XDIAddress.create("$rsa$2048")));
 		}
 
-		user.getXdiClient().send(messageEnvelope, null);	
+		user.getXdiClient().send(messageEnvelope);	
 	}
 
 	private void deleteKeyPair(String keyType) throws Xdi2ClientException {
@@ -449,7 +449,7 @@ public class CloudService {
 			message.createDelOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAuthenticationConstants.XDI_ADD_MSG_SIG_KEYPAIR));
 		}
 
-		user.getXdiClient().send(messageEnvelope, null);	
+		user.getXdiClient().send(messageEnvelope);	
 	}
 
 	public String[] getSignatureKeyPair() throws Xdi2ClientException {

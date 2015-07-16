@@ -18,11 +18,11 @@ import xdi2.core.util.XDIAddressUtil;
 import xdi2.manager.model.Card;
 import xdi2.manager.model.CloudUser;
 import xdi2.manager.util.CardXdiModelConverter;
-import xdi2.messaging.GetOperation;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageCollection;
 import xdi2.messaging.MessageEnvelope;
-import xdi2.messaging.MessageResult;
+import xdi2.messaging.operations.GetOperation;
+import xdi2.messaging.response.MessagingResponse;
 
 @Service
 public class CardService {
@@ -46,12 +46,12 @@ public class CardService {
 
 		log.debug("getCard message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
 
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		System.out.println(messageResult.getGraph().toString("XDI DISPLAY", null));
+		System.out.println(messagingResponse.getResultGraph().toString("XDI DISPLAY", null));
 
 
-		List<Card> cards = cardXdiModelConverter.convertXdiToCards(messageResult.getGraph());
+		List<Card> cards = cardXdiModelConverter.convertXdiToCards(messagingResponse.getResultGraph());
 
 		// Get default card
 		XDIAddress defaultCardXdiAddress = getDefaultCardXdiAddress();
@@ -82,9 +82,9 @@ public class CardService {
 
 		log.debug("getCard message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
 
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		List<Card> cards = cardXdiModelConverter.convertXdiToCards(messageResult.getGraph());
+		List<Card> cards = cardXdiModelConverter.convertXdiToCards(messagingResponse.getResultGraph());
 		if (cards == null) return null;
 		if (cards.size() > 1) {
 			throw new RuntimeException("Got " + cards.size() + " cards for the address " + cardXdiAddress);
@@ -115,7 +115,7 @@ public class CardService {
 
 		log.debug("createCard message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
 
-		user.getXdiClient().send(messageEnvelope, null);
+		user.getXdiClient().send(messageEnvelope);
 	}
 
 	@Secured("IS_AUTHENTICATED")
@@ -141,7 +141,7 @@ public class CardService {
 
 		log.debug("deleteCard message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
 
-		user.getXdiClient().send(messageEnvelope, null);
+		user.getXdiClient().send(messageEnvelope);
 	}
 
 	@Secured("IS_AUTHENTICATED")
@@ -176,7 +176,7 @@ public class CardService {
 
 		log.debug("setDefaultCard message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
 
-		user.getXdiClient().send(messageEnvelope, null);
+		user.getXdiClient().send(messageEnvelope);
 	}
 
 	private XDIAddress getDefaultCardXdiAddress() throws Xdi2ClientException {
@@ -191,11 +191,11 @@ public class CardService {
 
 		log.debug("getDefaultCardXdiAddress message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
 
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		System.out.println(messageResult.getGraph().toString("XDI DISPLAY", null));
+		System.out.println(messagingResponse.getResultGraph().toString("XDI DISPLAY", null));
 
-		Relation relation = messageResult.getGraph().getDeepRelation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), CardXdiModelConverter.XDI_CARD_DEFAULT), XDIAddress.create("$ref"));
+		Relation relation = messagingResponse.getResultGraph().getDeepRelation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), CardXdiModelConverter.XDI_CARD_DEFAULT), XDIAddress.create("$ref"));
 		if (relation == null) return null;
 
 		return relation.getTargetXDIAddress();
@@ -218,9 +218,9 @@ public class CardService {
 
 		log.debug("getCardAddressByShortcut message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
 
-		MessageResult messageResult = user.getXdiClient().send(messageEnvelope, null);
+		MessagingResponse messagingResponse = user.getXdiClient().send(messageEnvelope);
 
-		Relation relation = messageResult.getGraph().getDeepRelation(XDIAddress.create(cardShortcut), XDIAddress.create("$ref"));
+		Relation relation = messagingResponse.getResultGraph().getDeepRelation(XDIAddress.create(cardShortcut), XDIAddress.create("$ref"));
 		if (relation == null) return null;
 
 		return relation.getTargetXDIAddress();

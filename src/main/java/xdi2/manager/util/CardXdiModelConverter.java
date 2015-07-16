@@ -259,11 +259,11 @@ public class CardXdiModelConverter {
 		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		String signatureKeys[] = cloudService.getSignatureKeyPair();
 		
-		String cloudCardUrl = null;
+		String cloudCardUri = null;
 		try {
-			cloudCardUrl = configuration.getCloudCardAppUrl() + user.getEnvironment() + "/" + URLEncoder.encode(cardXdiAddress.toString(), "UTF-8");
+			cloudCardUri = configuration.getCloudCardAppUri() + user.getEnvironment() + "/" + URLEncoder.encode(cardXdiAddress.toString(), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
-			log.error("Unable to URL encode (" + cardXdiAddress.toString() + ") ");
+			log.error("Unable to URI encode (" + cardXdiAddress.toString() + ") ");
 		}
 
 		String messageConnectXdiAddress = user.getCloudNumber() + "[$msg]@0";
@@ -272,7 +272,7 @@ public class CardXdiModelConverter {
 		messageConnect += messageConnectXdiAddress + "/$is$do/(" + user.getCloudNumber() + "/[+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa)[+]!:uuid:ca51aeb9-e09e-4305-89d7-87a944a1e1fa#community$do\n";
 		messageConnect += messageConnectXdiAddress + "$do/$do$is{}/+danubeclouds#forever{$do}\n";
 		messageConnect += messageConnectXdiAddress + "{$card}/$is/" + cardXdiAddress + "\n";
-		messageConnect += messageConnectXdiAddress + "<#return><$uri>&/&/\"" + cloudCardUrl + "\"\n";
+		messageConnect += messageConnectXdiAddress + "<#return><$uri>&/&/\"" + cloudCardUri + "\"\n";
 
 		String messageGetXdiAddress = user.getCloudNumber() + "[$msg]@1";
 		messageConnect += messageGetXdiAddress + "/$is()/({$to})\n";
@@ -280,7 +280,7 @@ public class CardXdiModelConverter {
 		messageConnect += messageGetXdiAddress + "/$is$do/("+ user.getCloudNumber() +"/{$to})+danubeclouds#forever$do\n";
 		messageConnect += messageGetXdiAddress + "$do/$get$is/" + cardXdiAddress + "\n";
 		messageConnect += "(" + messageGetXdiAddress + "$do/$get$is)" + user.getCloudNumber() + "/$is$ref/{}\n";
-		messageConnect += messageGetXdiAddress + "<#return><$uri>&/&/\"" + cloudCardUrl + "\"\n";
+		messageConnect += messageGetXdiAddress + "<#return><$uri>&/&/\"" + cloudCardUri + "\"\n";
 		messageConnect += messageGetXdiAddress + "$get<$deref>&/&/true\n";
 		
 		

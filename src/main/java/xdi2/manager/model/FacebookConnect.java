@@ -2,16 +2,16 @@ package xdi2.manager.model;
 
 public class FacebookConnect {
 
-	private String oAuthUrl;
+	private String oAuthUri;
 	private String userId;
 	private String accessToken;
 	
 	
-	public String getoAuthUrl() {
-		return oAuthUrl;
+	public String getoAuthUri() {
+		return oAuthUri;
 	}
-	public void setoAuthUrl(String oAuthUrl) {
-		this.oAuthUrl = oAuthUrl;
+	public void setoAuthUri(String oAuthUri) {
+		this.oAuthUri = oAuthUri;
 	}
 	public String getUserId() {
 		return userId;

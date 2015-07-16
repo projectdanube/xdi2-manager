@@ -7,10 +7,10 @@ import org.springframework.stereotype.Component;
 public class Configuration {
 	
 	@Value("${cloud.card.app.url}")
-	private String cloudCardAppUrl;
+	private String cloudCardAppUri;
 
-	public String getCloudCardAppUrl() {
-		return cloudCardAppUrl;
+	public String getCloudCardAppUri() {
+		return cloudCardAppUri;
 	}
 
 }

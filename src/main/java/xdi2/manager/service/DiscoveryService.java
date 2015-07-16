@@ -25,11 +25,11 @@ public class DiscoveryService {
 		
 		DiscoveryCloudStatus status = new DiscoveryCloudStatus(cloudName);
 		
-		XDIDiscoveryResult result = getXdiDiscoveryForEnv(env).discover(XDIAddress.create(cloudName), null);
+		XDIDiscoveryResult result = getXdiDiscoveryForEnv(env).discover(XDIAddress.create(cloudName));
 
 		status.setCloudNumber(ObjectUtils.toString(result.getCloudNumber(), null));
 
-		status.setCloudEndpoint(ObjectUtils.toString(result.getXdiEndpointUrl(), null));
+		status.setCloudEndpoint(ObjectUtils.toString(result.getXdiEndpointUri(), null));
 
 		status.setEncryptionPublicKey(result.getEncryptionPublicKey() != null ? Base64.encodeBase64String(result.getEncryptionPublicKey().getEncoded()) : null);
 		status.setSignaturePublicKey(result.getSignaturePublicKey() != null ? Base64.encodeBase64String(result.getSignaturePublicKey().getEncoded()) : null);
@@ -42,7 +42,7 @@ public class DiscoveryService {
 		Assert.hasLength(cloudName);
 		cloudName = XdiUtils.normalizeCloudName(cloudName);
 		
-		XDIDiscoveryResult result = getXdiDiscoveryForEnv(env).discoverFromRegistry(XDIAddress.create(cloudName), null);
+		XDIDiscoveryResult result = getXdiDiscoveryForEnv(env).discoverFromRegistry(XDIAddress.create(cloudName));
 
 		return result.getCloudNumber();
 	}

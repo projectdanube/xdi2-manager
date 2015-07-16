@@ -3,7 +3,7 @@ package xdi2.manager.model;
 import java.io.Serializable;
 
 import xdi2.client.XDIClient;
-import xdi2.client.http.XDIHttpClient;
+import xdi2.client.impl.http.XDIHttpClient;
 import xdi2.core.features.linkcontracts.instance.RootLinkContract;
 import xdi2.core.syntax.CloudNumber;
 import xdi2.messaging.Message;
@@ -13,15 +13,15 @@ public class CloudUser implements Serializable {
 	
 	private String cloudName;
 	private String cloudNumber;
-	private String xdiEndpointUrl;
+	private String xdiEndpointUri;
 	private String secretToken;	
 	private Environment environment;
 
-	public CloudUser(String cloudName, CloudNumber cloudNumber, String xdiEndpointUrl, String secretToken, Environment environment) {
+	public CloudUser(String cloudName, CloudNumber cloudNumber, String xdiEndpointUri, String secretToken, Environment environment) {
 		super();
 		this.cloudName = cloudName;
 		this.cloudNumber = cloudNumber.toString();
-		this.xdiEndpointUrl = xdiEndpointUrl;
+		this.xdiEndpointUri = xdiEndpointUri;
 		this.secretToken = secretToken;
 		this.environment = environment;
 	}
@@ -35,7 +35,7 @@ public class CloudUser implements Serializable {
 	}
 	
 	public XDIClient getXdiClient() {
-		return new XDIHttpClient(this.xdiEndpointUrl);
+		return new XDIHttpClient(this.xdiEndpointUri);
 	}
 
 	public CloudNumber getCloudNumber() {
@@ -50,8 +50,8 @@ public class CloudUser implements Serializable {
 		return secretToken;
 	}
 
-	public String getXdiEndpointUrl() {
-		return xdiEndpointUrl;
+	public String getXdiEndpointUri() {
+		return xdiEndpointUri;
 	}
 	
 	public Environment getEnvironment() {

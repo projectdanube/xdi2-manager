@@ -16,7 +16,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
 import xdi2.client.exceptions.Xdi2ClientException;
-import xdi2.client.http.ssl.XDI2X509TrustManager;
+import xdi2.client.impl.http.ssl.XDI2X509TrustManager;
 import xdi2.core.features.linkcontracts.instance.RootLinkContract;
 import xdi2.core.syntax.CloudNumber;
 import xdi2.core.syntax.XDIAddress;
@@ -74,7 +74,7 @@ public class XdiAuthenticationProvider implements AuthenticationProvider {
 		
 		XDIDiscoveryResult result = null;
 		try {
-			result = discoveryClient.discoverFromRegistry(XDIAddress.create(cloudName), null);
+			result = discoveryClient.discoverFromRegistry(XDIAddress.create(cloudName));
 		} catch (Xdi2ClientException e1) {
 			log.warn("Error while discovering " + cloudName + ": " + e1.getMessage(), e1);
 			throw new UsernameNotFoundException(e1.getMessage());
@@ -82,12 +82,12 @@ public class XdiAuthenticationProvider implements AuthenticationProvider {
 		if (result == null || result.getCloudNumber() == null) {
 			throw new UsernameNotFoundException("Cloud " + cloudName + " not found.");
 		}
-		if (result.getXdiEndpointUrl() == null || StringUtils.isBlank(result.getXdiEndpointUrl().toString())){
+		if (result.getXdiEndpointUri() == null || StringUtils.isBlank(result.getXdiEndpointUri().toString())){
 			throw new UsernameNotFoundException("Cloud " + cloudName + " found with Cloud Number " + result.getCloudNumber() + " but without Cloud Endpoint.");	
 		}
 
 		CloudNumber cloudNumber = result.getCloudNumber();
-		String xdiEndpointUri = result.getXdiEndpointUrl().toString();
+		String xdiEndpointUri = result.getXdiEndpointUri().toString();
 
 		// authentication on personal cloud
 		CloudUser cloudUser = new CloudUser(cloudName, cloudNumber, xdiEndpointUri, secretToken, env);
@@ -99,7 +99,7 @@ public class XdiAuthenticationProvider implements AuthenticationProvider {
 		message.createGetOperation(RootLinkContract.createRootLinkContractXDIAddress(cloudUser.getCloudNumber().getXDIAddress()));
 	
 		try {
-			cloudUser.getXdiClient().send(messageEnvelope, null);
+			cloudUser.getXdiClient().send(messageEnvelope);
 		} catch (Xdi2ClientException e) {
 			if (StringUtils.containsIgnoreCase(e.getMessage(), "invalid secret token")) {
 				throw new BadCredentialsException("Invalid Cloud Name or password ");
