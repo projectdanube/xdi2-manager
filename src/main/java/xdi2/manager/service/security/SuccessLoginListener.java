@@ -15,7 +15,7 @@ public class SuccessLoginListener implements ApplicationListener<AuthenticationS
 	@Override
 	public void onApplicationEvent(AuthenticationSuccessEvent event) {
 		CloudUser user = (CloudUser) event.getAuthentication().getPrincipal();
-		log.info("Login successfully " + user.getCloudName() + " in " + user.getEnvironment());
+		log.info("Login successfully " + user.getCloudName());
 	}
 
 }

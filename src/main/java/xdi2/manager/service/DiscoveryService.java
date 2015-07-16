@@ -10,22 +10,20 @@ import xdi2.core.syntax.CloudNumber;
 import xdi2.core.syntax.XDIAddress;
 import xdi2.discovery.XDIDiscoveryClient;
 import xdi2.discovery.XDIDiscoveryResult;
-import xdi2.manager.model.Environment;
 import xdi2.manager.model.status.DiscoveryCloudStatus;
 import xdi2.manager.util.XdiUtils;
 
 @Service
 public class DiscoveryService {
 
-	public DiscoveryCloudStatus getCloudStatus (Environment env, String cloudName) throws Xdi2ClientException {
-		Assert.notNull(env);
+	public DiscoveryCloudStatus getCloudStatus (String cloudName) throws Xdi2ClientException {
 		Assert.hasLength(cloudName);
 		
 		cloudName = XdiUtils.normalizeCloudName(cloudName);
 		
 		DiscoveryCloudStatus status = new DiscoveryCloudStatus(cloudName);
 		
-		XDIDiscoveryResult result = getXdiDiscoveryForEnv(env).discover(XDIAddress.create(cloudName));
+		XDIDiscoveryResult result = XDIDiscoveryClient.XDI2_DISCOVERY_CLIENT.discover(XDIAddress.create(cloudName));
 
 		status.setCloudNumber(ObjectUtils.toString(result.getCloudNumber(), null));
 
@@ -37,22 +35,13 @@ public class DiscoveryService {
 		return status;
 	}
 	
-	public CloudNumber discover (Environment env, String cloudName) throws Xdi2ClientException {
-		Assert.notNull(env);
+	public CloudNumber discover (String cloudName) throws Xdi2ClientException {
 		Assert.hasLength(cloudName);
 		cloudName = XdiUtils.normalizeCloudName(cloudName);
 		
-		XDIDiscoveryResult result = getXdiDiscoveryForEnv(env).discoverFromRegistry(XDIAddress.create(cloudName));
+		XDIDiscoveryResult result = XDIDiscoveryClient.XDI2_DISCOVERY_CLIENT.discoverFromRegistry(XDIAddress.create(cloudName));
 
 		return result.getCloudNumber();
 	}
-	
-	private XDIDiscoveryClient getXdiDiscoveryForEnv(Environment env) {
-		
-		if (env == Environment.OTE) 
-			return XDIDiscoveryClient.XDI2_NEUSTAR_OTE_DISCOVERY_CLIENT;
-		else
-			return XDIDiscoveryClient.XDI2_NEUSTAR_PROD_DISCOVERY_CLIENT;
-	}
-	
+
 }

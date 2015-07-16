@@ -39,16 +39,6 @@
                         </h2>
                         <input type="text" class="form-control" placeholder="=yourname" id="cloudName" name="cloudName" required autofocus>
                         <input type="password" class="form-control" placeholder="Password" id="password" name="password" required>
-                        <div class="radio">
-                            <label>
-                                <input type="radio" name="env" id="envProd" value="PROD" checked>PROD
-                            </label>
-                        </div>
-                        <div class="radio">
-                            <label>
-                                <input type="radio" name="env" id="envOte" value="OTE">OTE
-                            </label>
-                        </div>
                         <br />
                         <c:if test="${'1' eq param.login_error}">
                             <div class="alert alert-danger" role="alert">

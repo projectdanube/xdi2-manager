@@ -15,15 +15,13 @@ public class CloudUser implements Serializable {
 	private String cloudNumber;
 	private String xdiEndpointUri;
 	private String secretToken;	
-	private Environment environment;
 
-	public CloudUser(String cloudName, CloudNumber cloudNumber, String xdiEndpointUri, String secretToken, Environment environment) {
+	public CloudUser(String cloudName, CloudNumber cloudNumber, String xdiEndpointUri, String secretToken) {
 		super();
 		this.cloudName = cloudName;
 		this.cloudNumber = cloudNumber.toString();
 		this.xdiEndpointUri = xdiEndpointUri;
 		this.secretToken = secretToken;
-		this.environment = environment;
 	}
 
 	public Message prepareMessageToCloud(Message message) {
@@ -52,9 +50,5 @@ public class CloudUser implements Serializable {
 
 	public String getXdiEndpointUri() {
 		return xdiEndpointUri;
-	}
-	
-	public Environment getEnvironment() {
-		return environment;
 	}
 }

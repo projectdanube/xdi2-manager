@@ -22,7 +22,6 @@ import xdi2.core.syntax.XDIStatement;
 import xdi2.core.util.XDIStatementUtil;
 import xdi2.discovery.XDIDiscoveryClient;
 import xdi2.discovery.XDIDiscoveryResult;
-import xdi2.manager.model.Environment;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageEnvelope;
 import xdi2.messaging.response.MessagingResponse;
@@ -39,37 +38,35 @@ public class ReverseNameResolutionService {
 		this.namesCache = new ConcurrentHashMap<String, String>();
 	}
 
-	public String getCloudName(Environment env, CloudNumber cloudNumber) {
-		Assert.notNull(env);
+	public String getCloudName(CloudNumber cloudNumber) {
 		Assert.notNull(cloudNumber);
 
-		return getCloudName(env, cloudNumber.toString());
+		return getCloudName(cloudNumber.toString());
 	}
 
-	public String getCloudName(Environment env, String cloudNumber) {
-		Assert.notNull(env);
+	public String getCloudName(String cloudNumber) {
 		Assert.hasLength(cloudNumber);
 
 		long start = System.currentTimeMillis();
-		String cloudName = namesCache.get(env + cloudNumber);
+		String cloudName = namesCache.get(cloudNumber);
 		if (cloudName == null) {
 			try {
-				cloudName = getCloudNameFromPublicLC(env, cloudNumber);
+				cloudName = getCloudNameFromPublicLC(cloudNumber);
 			}
 			catch (Exception e) {
-				log.warn("Not possible to get a cloud name for [" + env + "] " + cloudNumber + " - " + e.getMessage());
+				log.warn("Not possible to get a cloud name for " + cloudNumber + " - " + e.getMessage());
 				return null;
 			}
 
 			if (cloudName == null) {
-				log.warn("Not possible to get a cloud name for [" + env + "] " + cloudNumber);
+				log.warn("Not possible to get a cloud name for " + cloudNumber);
 				return null;
 			}
 			
-			namesCache.put(env + cloudNumber, cloudName);
+			namesCache.put(cloudNumber, cloudName);
 		}
 		
-		log.debug("CloudNumber [" + env + "] " + cloudNumber + " translated to " + cloudName + " in " + (System.currentTimeMillis() - start) + "ms");
+		log.debug("CloudNumber " + cloudNumber + " translated to " + cloudName + " in " + (System.currentTimeMillis() - start) + "ms");
 
 		return cloudName;
 	}
@@ -77,17 +74,13 @@ public class ReverseNameResolutionService {
 
 
 
-	private String getCloudNameFromPublicLC(Environment env, String cloudNumberStr) throws Xdi2DiscoveryException, Xdi2ClientException {
+	private String getCloudNameFromPublicLC(String cloudNumberStr) throws Xdi2DiscoveryException, Xdi2ClientException {
 
 		CloudNumber cloudNumber = CloudNumber.create(cloudNumberStr);
 		
 		// Discover Cloud Endpoint
 		XDI2X509TrustManager.enable();
-		XDIDiscoveryClient xdiDiscoveryClient;
-		if (env == Environment.OTE) 
-			xdiDiscoveryClient = XDIDiscoveryClient.XDI2_NEUSTAR_OTE_DISCOVERY_CLIENT;
-		else
-			xdiDiscoveryClient = XDIDiscoveryClient.XDI2_NEUSTAR_PROD_DISCOVERY_CLIENT;
+		XDIDiscoveryClient xdiDiscoveryClient = XDIDiscoveryClient.XDI2_DISCOVERY_CLIENT;
 
         XDIDiscoveryResult result = xdiDiscoveryClient.discoverFromRegistry(cloudNumber.getXDIAddress());
         if (result == null)

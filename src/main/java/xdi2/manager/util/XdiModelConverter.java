@@ -251,7 +251,7 @@ public class XdiModelConverter {
 			GenericLinkContract glc = (GenericLinkContract) linkContract;
 
 			connection.setRaCloudNumber(glc.getRequestingAuthority().toString());
-			connection.setRaCloudName(reverseNameResolutionService.getCloudName(user.getEnvironment(), connection.getRaCloudNumber()));
+			connection.setRaCloudName(reverseNameResolutionService.getCloudName(connection.getRaCloudNumber()));
 		}
 
 		return connection;

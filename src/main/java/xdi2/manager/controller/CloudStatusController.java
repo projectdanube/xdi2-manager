@@ -33,8 +33,8 @@ public class CloudStatusController extends AbstractController {
 		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 		
 		long start = System.currentTimeMillis();
-		DiscoveryCloudStatus status = discoveryService.getCloudStatus(user.getEnvironment(), user.getCloudName());
-		log.debug("getDiscoveryStatus (" + user.getEnvironment() + ", " + user.getCloudName() + ") took " + (System.currentTimeMillis() - start) + " ms.");
+		DiscoveryCloudStatus status = discoveryService.getCloudStatus(user.getCloudName());
+		log.debug("getDiscoveryStatus (" + user.getCloudName() + ") took " + (System.currentTimeMillis() - start) + " ms.");
 		
 		return status;
 	}
@@ -49,7 +49,7 @@ public class CloudStatusController extends AbstractController {
 	public String discoverCloudName(@PathVariable String cloudName) throws Xdi2ClientException {
 		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-		return ObjectUtils.toString("\"" + discoveryService.discover(user.getEnvironment(), cloudName) + "\"", null);
+		return ObjectUtils.toString("\"" + discoveryService.discover(cloudName) + "\"", null);
 	}
 
 }

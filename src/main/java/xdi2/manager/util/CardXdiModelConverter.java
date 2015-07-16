@@ -261,7 +261,7 @@ public class CardXdiModelConverter {
 		
 		String cloudCardUri = null;
 		try {
-			cloudCardUri = configuration.getCloudCardAppUri() + user.getEnvironment() + "/" + URLEncoder.encode(cardXdiAddress.toString(), "UTF-8");
+			cloudCardUri = configuration.getCloudCardAppUri() + URLEncoder.encode(cardXdiAddress.toString(), "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			log.error("Unable to URI encode (" + cardXdiAddress.toString() + ") ");
 		}

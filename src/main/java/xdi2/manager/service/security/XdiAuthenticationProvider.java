@@ -23,7 +23,6 @@ import xdi2.core.syntax.XDIAddress;
 import xdi2.discovery.XDIDiscoveryClient;
 import xdi2.discovery.XDIDiscoveryResult;
 import xdi2.manager.model.CloudUser;
-import xdi2.manager.model.Environment;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageCollection;
 import xdi2.messaging.MessageEnvelope;
@@ -40,19 +39,15 @@ public class XdiAuthenticationProvider implements AuthenticationProvider {
 		String secretToken = (String) authentication.getCredentials();
 		
 		// check if request comes from HTML form or basic auth
-		Environment env = null;
 		if (authentication.getDetails() instanceof CMWebAuthenticationDetails) {
-			// form
-			env  = ((CMWebAuthenticationDetails) authentication.getDetails()).getEnv();
 		}
 		else {
 			// basic auth - env is part of "username" ENV=cloudname
 			String[] param = StringUtils.split(cloudName, "=*+");
 			
 			cloudName = cloudName.substring(cloudName.indexOf(param[1]) - 1);
-			env = Environment.valueOf(param[0]);
 			
-			log.debug("Basic Auth: trying to authenticate " + cloudName + " in " + env);
+			log.debug("Basic Auth: trying to authenticate " + cloudName);
 		}
 		
 		 
@@ -64,13 +59,7 @@ public class XdiAuthenticationProvider implements AuthenticationProvider {
 		// cloud name discovery
 		XDI2X509TrustManager.enable();
 
-		XDIDiscoveryClient discoveryClient = null;
-		if(env == Environment.PROD) {
-			discoveryClient = XDIDiscoveryClient.DEFAULT_DISCOVERY_CLIENT;
-		}
-		else {
-			discoveryClient = XDIDiscoveryClient.XDI2_NEUSTAR_OTE_DISCOVERY_CLIENT;
-		}
+		XDIDiscoveryClient discoveryClient = XDIDiscoveryClient.XDI2_DISCOVERY_CLIENT;
 		
 		XDIDiscoveryResult result = null;
 		try {
@@ -90,7 +79,7 @@ public class XdiAuthenticationProvider implements AuthenticationProvider {
 		String xdiEndpointUri = result.getXdiEndpointUri().toString();
 
 		// authentication on personal cloud
-		CloudUser cloudUser = new CloudUser(cloudName, cloudNumber, xdiEndpointUri, secretToken, env);
+		CloudUser cloudUser = new CloudUser(cloudName, cloudNumber, xdiEndpointUri, secretToken);
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 		MessageCollection messageCollection = messageEnvelope.getMessageCollection(cloudUser.getCloudNumber().getXDIAddress(), true);

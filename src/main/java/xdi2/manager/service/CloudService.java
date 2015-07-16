@@ -162,7 +162,7 @@ public class CloudService {
 			Relation r = relations.next();
 			
 			String dependentCloudNumber = r.getTargetXDIAddress().toString();
-			dependents.add(reverseNameResolutionService.getCloudName(user.getEnvironment(), dependentCloudNumber));
+			dependents.add(reverseNameResolutionService.getCloudName(dependentCloudNumber));
 		}
 
 		return dependents;
@@ -191,7 +191,7 @@ public class CloudService {
 			
 			// there is a link contract with this relation
 			if (dependentCloudNumber.startsWith("[=]"))
-				guardians.add(reverseNameResolutionService.getCloudName(user.getEnvironment(), dependentCloudNumber));
+				guardians.add(reverseNameResolutionService.getCloudName(dependentCloudNumber));
 		}
 
 		return guardians;
