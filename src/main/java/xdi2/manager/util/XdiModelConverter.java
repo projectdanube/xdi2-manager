@@ -19,6 +19,7 @@ import org.springframework.util.Assert;
 
 import xdi2.core.Graph;
 import xdi2.core.LiteralNode;
+import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDILinkContractConstants;
 import xdi2.core.features.linkcontracts.LinkContractBase;
 import xdi2.core.features.linkcontracts.instance.GenericLinkContract;
@@ -179,7 +180,7 @@ public class XdiModelConverter {
 
 	private static String getStringLiteralForSegment(Graph graph, CloudNumber cloudNumber, XDIAddress segment) {
 
-		LiteralNode l = graph.getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), segment));
+		LiteralNode l = graph.getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(cloudNumber.getXDIAddress(), segment, XDIAddress.create("&")));
 		return l != null ? l.getLiteralDataString() : null;
 	}
 
