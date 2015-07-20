@@ -548,8 +548,39 @@ controllers.controller("FacebookCtrl", ['$scope', '$http', '$sce',
 
   }]);
 
-
 controllers.controller("GenericModalCtrl", ['$scope', '$modalInstance', 'labels',
+  function ($scope, $modalInstance, labels) {
+
+        $scope.labels = labels;
+
+        $scope.ok = function () {
+            $modalInstance.close('OK');
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+
+
+  }]);
+  
+controllers.controller("IntentsCtrl", ['$scope', '$modalInstance', 'labels',
+  function ($scope, $modalInstance, labels) {
+
+        $scope.labels = labels;
+
+        $scope.ok = function () {
+            $modalInstance.close('OK');
+        };
+
+        $scope.cancel = function () {
+            $modalInstance.dismiss('cancel');
+        };
+
+
+  }]);
+
+controllers.controller("OffersCtrl", ['$scope', '$modalInstance', 'labels',
   function ($scope, $modalInstance, labels) {
 
         $scope.labels = labels;

@@ -131,7 +131,4 @@ public class CloudController extends AbstractController {
 	public long getDependentsCount() throws Xdi2ClientException {
 		return cloudService.getDependents().size();
 	}
-
-
-
 }
