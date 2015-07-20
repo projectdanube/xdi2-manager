@@ -40,12 +40,12 @@ import xdi2.messaging.response.MessagingResponse;
 public class FacebookService {
 	private static final Logger log = LoggerFactory.getLogger(FacebookService.class);
 
-	public static final XDIAddress XDI_ADD_FACEBOOK_FIRST_NAME = XDIAddress.create("#(user)<#(first_name)>&");
-	public static final XDIAddress XDI_ADD_FACEBOOK_LAST_NAME = XDIAddress.create("#(user)<#(last_name)>&");
-	public static final XDIAddress XDI_ADD_FACEBOOK_GENDER = XDIAddress.create("#(user)<#(gender)>&");
-	public static final XDIAddress XDI_ADD_FACEBOOK_EMAIL = XDIAddress.create("#(user)<#(email)>&");
-	public static final XDIAddress XDI_ADD_FACEBOOK_WEBSITE = XDIAddress.create("#(user)<#(website)>&");
-	public static final XDIAddress XDI_ADD_FACEBOOK_BIRTHDAY = XDIAddress.create("#(user)<#(birthday)>&");
+	public static final XDIAddress XDI_ADD_FACEBOOK_FIRST_NAME = XDIAddress.create("#(user)<#(first_name)>");
+	public static final XDIAddress XDI_ADD_FACEBOOK_LAST_NAME = XDIAddress.create("#(user)<#(last_name)>");
+	public static final XDIAddress XDI_ADD_FACEBOOK_GENDER = XDIAddress.create("#(user)<#(gender)>");
+	public static final XDIAddress XDI_ADD_FACEBOOK_EMAIL = XDIAddress.create("#(user)<#(email)>");
+	public static final XDIAddress XDI_ADD_FACEBOOK_WEBSITE = XDIAddress.create("#(user)<#(website)>");
+	public static final XDIAddress XDI_ADD_FACEBOOK_BIRTHDAY = XDIAddress.create("#(user)<#(birthday)>");
 
     public static final Map<String, XDIAddress> XDI_FACEBOOK_PROFILE;
     static {
