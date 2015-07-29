@@ -53,10 +53,10 @@ public class CardXdiModelConverter {
 	public static XDIAddress XDI_CARD_PRIVATE = XDIAddress.create("$private");
 	public static XDIAddress XDI_CARD_DEFAULT = XDIAddress.create("$card");
 
-	public static XDIAddress XDI_CARD_DESCRIPTION = XDIAddress.create("$public<#description>&");
-	public static XDIAddress XDI_CARD_TAG = XDIAddress.create("$public<#tag>&");
-	public static XDIAddress XDI_CARD_CONNECT_BUTTON = XDIAddress.create("$public<#connect><#button>&");
-	public static XDIAddress XDI_CARD_BACKGROUND_IMAGE = XDIAddress.create("$public<#background><#image>&");
+	public static XDIAddress XDI_CARD_DESCRIPTION = XDIAddress.create("$public<#description>");
+	public static XDIAddress XDI_CARD_TAG = XDIAddress.create("$public<#tag>");
+	public static XDIAddress XDI_CARD_CONNECT_BUTTON = XDIAddress.create("$public<#connect><#button>");
+	public static XDIAddress XDI_CARD_BACKGROUND_IMAGE = XDIAddress.create("$public<#background><#image>");
 	
 	private static CardField DUMMY_CARD_FIELD = new CardField(null, null, CardFieldPrivacy.ONLY_ME);
 

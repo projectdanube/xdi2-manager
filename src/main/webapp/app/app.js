@@ -56,6 +56,14 @@ CloudDashboardApp.config(['$routeProvider', '$resourceProvider', '$httpProvider'
             controller: 'CloudStatusCtrl',
             templateUrl: 'cloudStatus.html'
         }).
+        when('/intents', {
+            controller: 'IntentsCtrl',
+            templateUrl: 'intents.html'
+        }).
+        when('/offers', {
+            controller: 'OffersCtrl',
+            templateUrl: 'offers.html'
+        }).
         otherwise({
             redirectTo: '/'
         });

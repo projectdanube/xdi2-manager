@@ -407,10 +407,10 @@ public class CloudService {
 
 		String[] keyPair = new String[2];
 
-		LiteralNode l = messagingResponse.getResultGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAddress.create(subsegment + "<$public><$key>&")));
+		LiteralNode l = messagingResponse.getResultGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAddress.create(subsegment + "<$public><$key>")));
 		keyPair[0] = l != null ? l.getLiteralDataString() : null;		
 
-		l = messagingResponse.getResultGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAddress.create(subsegment + "<$private><$key>&")));
+		l = messagingResponse.getResultGraph().getRootContextNode().getDeepLiteralNode(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAddress.create(subsegment + "<$private><$key>")));
 		keyPair[1] = l != null ? l.getLiteralDataString() : null;
 
 		return keyPair;

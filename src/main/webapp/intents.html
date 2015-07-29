@@ -1,0 +1,43 @@
+<div class="row">
+    <div class="col-lg-12">
+        <h1 class="page-header">Intents</h1>
+    </div>
+    <!-- /.col-lg-12 -->
+</div>
+<!-- /.row -->
+
+<div class="row" ng-hide="inProgress">
+    <div class="col-lg-8">
+
+        <div class="row">
+            <div class="col-lg-12" ng-hide="facebookConnector.userId">
+                <p>What are you looking for?</p>
+                <table cellspacing="100"> 
+                <tr>
+                <td>
+                <img src="/assets/images/flight.png" width="150">
+                </td>
+                <td style="padding:20px"><textarea cols="80" rows="5">VIE to CDG 2015-07-19
+Direct flight</textarea></td>
+                </tr><tr>
+                <td>
+                <img src="/assets/images/hotel.png" width="150">
+                </td>
+                <td style="padding:20px"><textarea cols="80" rows="5"></textarea></td>
+                </tr><tr>
+                <td>
+                <img src="/assets/images/car.png" width="150">
+                </td>
+                <td style="padding:20px"><textarea cols="80" rows="5"></textarea></td>
+                </tr>
+                </table>
+                <button type="button" class="btn btn-info" ng-click="connect()"><i class="fa fa-link"></i> Publish intent to marketplace</button>
+            </div>
+        </div>
+        <div class="spacer20"></div>
+
+
+    </div>
+</div>
+
+
