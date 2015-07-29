@@ -26,7 +26,7 @@ public class CloudUser implements Serializable {
 
 	public Message prepareMessageToCloud(Message message) {
 		message.setToPeerRootXDIArc(getCloudNumber().getPeerRootXDIArc());
-		message.setLinkContract(RootLinkContract.class);
+		message.setLinkContractClass(RootLinkContract.class);
 		message.setSecretToken(this.secretToken);
 
 		return message;
