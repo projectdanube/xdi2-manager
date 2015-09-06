@@ -21,6 +21,7 @@ import xdi2.manager.util.CardXdiModelConverter;
 import xdi2.messaging.Message;
 import xdi2.messaging.MessageCollection;
 import xdi2.messaging.MessageEnvelope;
+import xdi2.messaging.constants.XDIMessagingConstants;
 import xdi2.messaging.operations.GetOperation;
 import xdi2.messaging.response.MessagingResponse;
 
@@ -42,7 +43,7 @@ public class CardService {
 		Message message = messageCollection.createMessage();
 		message = user.prepareMessageToCloud(message);
 		GetOperation operation = message.createGetOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), CardXdiModelConverter.XDI_CARDS));
-		operation.setParameter(GetOperation.XDI_ADD_PARAMETER_DEREF, Boolean.TRUE);
+		operation.setParameter(XDIMessagingConstants.XDI_ADD_OPERATION_PARAMETER_DEREF, Boolean.TRUE);
 
 		log.debug("getCard message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
 
@@ -78,7 +79,7 @@ public class CardService {
 		Message message = messageCollection.createMessage();
 		message = user.prepareMessageToCloud(message);
 		GetOperation operation = message.createGetOperation(cardXdiAddress);
-		if (edit == false) operation.setParameter(GetOperation.XDI_ADD_PARAMETER_DEREF, Boolean.TRUE);
+		if (edit == false) operation.setParameter(XDIMessagingConstants.XDI_ADD_OPERATION_PARAMETER_DEREF, Boolean.TRUE);
 
 		log.debug("getCard message:\n" + messageEnvelope.getGraph().toString("XDI DISPLAY", null));
 

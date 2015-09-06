@@ -13,12 +13,12 @@ import org.slf4j.LoggerFactory;
 
 import xdi2.core.ContextNode;
 import xdi2.core.Graph;
-import xdi2.core.features.signatures.KeyPairSignature;
-import xdi2.core.features.signatures.Signature;
+import xdi2.core.features.signatures.RSASignature;
 import xdi2.core.features.signatures.Signatures;
 import xdi2.core.impl.memory.MemoryGraphFactory;
 import xdi2.core.io.XDIReader;
 import xdi2.core.io.XDIReaderRegistry;
+import xdi2.core.security.sign.RSAStaticPrivateKeySignatureCreator;
 import xdi2.core.syntax.XDIAddress;
 
 public class XdiUtils {
@@ -58,13 +58,13 @@ public class XdiUtils {
 				if (contextNode == null) throw new RuntimeException("No context node found at address " + address);
 
 				// sign
-				Signature<?, ?> signature = Signatures.createSignature(contextNode, "sha", 256, "rsa", 2048, true);
+				RSASignature signature = (RSASignature) Signatures.createSignature(contextNode, "sha", 256, "rsa", 2048, true);
 
 				PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.decodeBase64(key));
 				KeyFactory keyFactory = KeyFactory.getInstance("RSA");
 				Key k = keyFactory.generatePrivate(keySpec);
 
-				((KeyPairSignature) signature).sign((PrivateKey) k);
+				new RSAStaticPrivateKeySignatureCreator((PrivateKey) k).createSignature(signature);
 			}
 
 			return graph;
