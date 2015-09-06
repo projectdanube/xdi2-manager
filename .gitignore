@@ -1,7 +1,9 @@
 .externalToolBuilders
 .DS_Store
-/bin/
-/target
-/log4j.log
-/temp/
+log4j.log
+.classpath
+.project
 /.settings/
+/bin/
+/target/
+/temp/
