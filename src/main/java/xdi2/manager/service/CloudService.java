@@ -16,9 +16,9 @@ import xdi2.client.exceptions.Xdi2ClientException;
 import xdi2.core.ContextNode;
 import xdi2.core.LiteralNode;
 import xdi2.core.Relation;
-import xdi2.core.constants.XDIAuthenticationConstants;
 import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDIDictionaryConstants;
+import xdi2.core.constants.XDISecurityConstants;
 import xdi2.core.features.linkcontracts.LinkContractTemplates;
 import xdi2.core.features.linkcontracts.LinkContracts;
 import xdi2.core.features.linkcontracts.instance.LinkContract;
@@ -395,11 +395,11 @@ public class CloudService {
 
 		String subsegment = null;		
 		if ("ENCRYPT".equals(keyType)) {
-			message.createGetOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAuthenticationConstants.XDI_ADD_MSG_ENCRYPT_KEYPAIR));
+			message.createGetOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDISecurityConstants.XDI_ADD_MSG_ENCRYPT_KEYPAIR));
 			subsegment = "$msg$encrypt$keypair";
 		}
 		else {
-			message.createGetOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAuthenticationConstants.XDI_ADD_MSG_SIG_KEYPAIR));
+			message.createGetOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDISecurityConstants.XDI_ADD_MSG_SIG_KEYPAIR));
 			subsegment = "$msg$sig$keypair";
 		}
 
@@ -425,10 +425,10 @@ public class CloudService {
 		message = user.prepareMessageToCloud(message);
 
 		if ("ENCRYPT".equals(keyType)) {
-			message.createOperation(GenerateKeyContributor.XDI_ADD_DO_KEYPAIR, XDIStatement.fromComponents(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAuthenticationConstants.XDI_ADD_MSG_ENCRYPT_KEYPAIR), XDIDictionaryConstants.XDI_ADD_IS_TYPE, XDIAddress.create("$rsa$2048")));
+			message.createOperation(GenerateKeyContributor.XDI_ADD_DO_KEYPAIR, XDIStatement.fromComponents(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDISecurityConstants.XDI_ADD_MSG_ENCRYPT_KEYPAIR), XDIDictionaryConstants.XDI_ADD_IS_TYPE, XDIAddress.create("$rsa$2048")));
 		}
 		else {
-			message.createOperation(GenerateKeyContributor.XDI_ADD_DO_KEYPAIR, XDIStatement.fromComponents(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAuthenticationConstants.XDI_ADD_MSG_SIG_KEYPAIR), XDIDictionaryConstants.XDI_ADD_IS_TYPE, XDIAddress.create("$rsa$2048")));
+			message.createOperation(GenerateKeyContributor.XDI_ADD_DO_KEYPAIR, XDIStatement.fromComponents(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDISecurityConstants.XDI_ADD_MSG_SIG_KEYPAIR), XDIDictionaryConstants.XDI_ADD_IS_TYPE, XDIAddress.create("$rsa$2048")));
 		}
 
 		user.getXdiClient().send(messageEnvelope);	
@@ -443,10 +443,10 @@ public class CloudService {
 		message = user.prepareMessageToCloud(message);
 
 		if ("ENCRYPT".equals(keyType)) {
-			message.createDelOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAuthenticationConstants.XDI_ADD_MSG_ENCRYPT_KEYPAIR));			
+			message.createDelOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDISecurityConstants.XDI_ADD_MSG_ENCRYPT_KEYPAIR));			
 		}
 		else {			
-			message.createDelOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDIAuthenticationConstants.XDI_ADD_MSG_SIG_KEYPAIR));
+			message.createDelOperation(XDIAddressUtil.concatXDIAddresses(user.getCloudNumber().getXDIAddress(), XDISecurityConstants.XDI_ADD_MSG_SIG_KEYPAIR));
 		}
 
 		user.getXdiClient().send(messageEnvelope);	

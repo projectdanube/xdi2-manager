@@ -18,7 +18,7 @@ import xdi2.core.features.signatures.Signatures;
 import xdi2.core.impl.memory.MemoryGraphFactory;
 import xdi2.core.io.XDIReader;
 import xdi2.core.io.XDIReaderRegistry;
-import xdi2.core.security.sign.RSAStaticPrivateKeySignatureCreator;
+import xdi2.core.security.signature.create.RSAStaticPrivateKeySignatureCreator;
 import xdi2.core.syntax.XDIAddress;
 
 public class XdiUtils {
