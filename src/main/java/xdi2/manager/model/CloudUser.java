@@ -14,20 +14,20 @@ public class CloudUser implements Serializable {
 	private String cloudName;
 	private String cloudNumber;
 	private String xdiEndpointUri;
-	private String secretToken;	
+	private String secret;	
 
-	public CloudUser(String cloudName, CloudNumber cloudNumber, String xdiEndpointUri, String secretToken) {
+	public CloudUser(String cloudName, CloudNumber cloudNumber, String xdiEndpointUri, String secret) {
 		super();
 		this.cloudName = cloudName;
 		this.cloudNumber = cloudNumber.toString();
 		this.xdiEndpointUri = xdiEndpointUri;
-		this.secretToken = secretToken;
+		this.secret = secret;
 	}
 
 	public Message prepareMessageToCloud(Message message) {
 		message.setToPeerRootXDIArc(getCloudNumber().getPeerRootXDIArc());
 		message.setLinkContractClass(RootLinkContract.class);
-		message.setSecretToken(this.secretToken);
+		message.setSecretToken(this.secret);
 
 		return message;
 	}
@@ -45,7 +45,7 @@ public class CloudUser implements Serializable {
 	}
 	
 	public String getSecretToken() {
-		return secretToken;
+		return secret;
 	}
 
 	public String getXdiEndpointUri() {
