@@ -36,7 +36,7 @@ public class XdiAuthenticationProvider implements AuthenticationProvider {
 	public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
 		String cloudName = authentication.getName();
-		String secretToken = (String) authentication.getCredentials();
+		String secret = (String) authentication.getCredentials();
 		
 		// check if request comes from HTML form or basic auth
 		if (authentication.getDetails() instanceof CMWebAuthenticationDetails) {
@@ -79,7 +79,7 @@ public class XdiAuthenticationProvider implements AuthenticationProvider {
 		String xdiEndpointUri = result.getXdiEndpointUri().toString();
 
 		// authentication on personal cloud
-		CloudUser cloudUser = new CloudUser(cloudName, cloudNumber, xdiEndpointUri, secretToken);
+		CloudUser cloudUser = new CloudUser(cloudName, cloudNumber, xdiEndpointUri, secret);
 
 		MessageEnvelope messageEnvelope = new MessageEnvelope();
 		MessageCollection messageCollection = messageEnvelope.getMessageCollection(cloudUser.getCloudNumber().getXDIAddress(), true);
@@ -103,7 +103,7 @@ public class XdiAuthenticationProvider implements AuthenticationProvider {
 		//		SimpleGrantedAuthority role = new SimpleGrantedAuthority("USER_ROLE");
 		//		authorities.add(role);
 
-		return new UsernamePasswordAuthenticationToken(cloudUser, secretToken, authorities);
+		return new UsernamePasswordAuthenticationToken(cloudUser, secret, authorities);
 	}
 
 	@Override
