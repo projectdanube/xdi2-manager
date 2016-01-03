@@ -4,7 +4,7 @@
 	<groupId>xdi2</groupId>
 	<artifactId>xdi2-manager</artifactId>
 	<packaging>war</packaging>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.1-SNAPSHOT</version>
 	<name>XDI Manager</name>
 	<url></url>
 
