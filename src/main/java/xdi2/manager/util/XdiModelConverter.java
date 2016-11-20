@@ -19,12 +19,11 @@ import org.springframework.util.Assert;
 
 import xdi2.core.Graph;
 import xdi2.core.LiteralNode;
-import xdi2.core.constants.XDIConstants;
 import xdi2.core.constants.XDILinkContractConstants;
 import xdi2.core.features.linkcontracts.LinkContractBase;
-import xdi2.core.features.linkcontracts.instance.GenericLinkContract;
 import xdi2.core.features.linkcontracts.instance.LinkContract;
 import xdi2.core.features.linkcontracts.instance.PublicLinkContract;
+import xdi2.core.features.linkcontracts.instance.RelationshipLinkContract;
 import xdi2.core.features.linkcontracts.instance.RootLinkContract;
 import xdi2.core.features.linkcontracts.template.LinkContractTemplate;
 import xdi2.core.features.policy.PolicyAnd;
@@ -246,10 +245,10 @@ public class XdiModelConverter {
 		else if (linkContract instanceof PublicLinkContract) {
 			connection.setType("PUBLIC");
 		}
-		else if (linkContract instanceof GenericLinkContract) {
+		else if (linkContract instanceof RelationshipLinkContract) {
 			connection.setType("GENERIC");
 
-			GenericLinkContract glc = (GenericLinkContract) linkContract;
+			RelationshipLinkContract glc = (RelationshipLinkContract) linkContract;
 
 			connection.setRaCloudNumber(glc.getRequestingAuthority().toString());
 			connection.setRaCloudName(reverseNameResolutionService.getCloudName(connection.getRaCloudNumber()));
@@ -266,7 +265,7 @@ public class XdiModelConverter {
 		connectionTemplate = (ConnectionTemplate) this.convertLCBaseToAbstractConnection(linkContractTemplate, connectionTemplate);
 
 		String tag = StringUtils.substringAfter(connectionTemplate.getXdiAddress(), "#");
-		tag = StringUtils.remove(tag, linkContractTemplate.getXdiVariable().getBaseXDIArc().toString());
+		tag = StringUtils.remove(tag, linkContractTemplate.getXdiEntitySingletonVariable().getBaseXDIArc().toString());
 		connectionTemplate.setTag(tag);
 
 		LiteralNode l = linkContractTemplate.getContextNode().getDeepLiteralNode(XDIAddress.create(connectionTemplate.getXdiAddress() + "<#description>"));
@@ -316,7 +315,7 @@ public class XdiModelConverter {
 		CloudUser user = (CloudUser) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
 		Graph g = MemoryGraphFactory.getInstance().openGraph();
-		LinkContract l = GenericLinkContract.findGenericLinkContract(g, XDIAddress.create(user.getCloudNumber().toString()), XDIAddress.create(connection.getRaCloudNumber()), null, null, true);
+		LinkContract l = RelationshipLinkContract.findRelationshipLinkContract(g, XDIAddress.create(user.getCloudNumber().toString()), XDIAddress.create(connection.getRaCloudNumber()), null, null, true);
 
 		l = (LinkContract) this.convertAbstractConnectionToLinkContractBase(connection, l);
 
